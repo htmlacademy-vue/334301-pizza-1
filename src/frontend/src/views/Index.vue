@@ -30,8 +30,8 @@
 
               <div class="sheet__content dough">
                 <label
-                  v-for="(dough, id) in preparedDough"
-                  :key="`dough-${id}`"
+                  v-for="(dough, doughIndex) in preparedDough"
+                  :key="`dough-${doughIndex}`"
                   class="dough__input"
                   :class="{
                     'dough__input--light': dough.name === 'Тонкое',
@@ -42,7 +42,7 @@
                     type="radio"
                     name="dought"
                     class="visually-hidden"
-                    :checked="id === 0"
+                    :checked="doughIndex === 0"
                     :value="dough.value"
                   />
                   <b>{{ dough.name }}</b>
@@ -58,8 +58,8 @@
 
               <div class="sheet__content diameter">
                 <label
-                  v-for="(size, id) in preparedSizes"
-                  :key="`size-${id}`"
+                  v-for="(size, sizeIndex) in preparedSizes"
+                  :key="`size-${sizeIndex}`"
                   class="diameter__input"
                   :class="{
                     'diameter__input--small': size.multiplier === '1',
@@ -72,7 +72,7 @@
                     type="radio"
                     name="diameter"
                     :value="size.value"
-                    :checked="id === 0"
+                    :checked="sizeIndex === 0"
                   />
                   <span>{{ size.name }}</span>
                 </label>
@@ -92,14 +92,14 @@
 
                   <label
                     class="radio ingridients__input"
-                    v-for="(sauce, id) in preparedSauces"
-                    :key="`sauce-${id}`"
+                    v-for="(sauce, sauceIndex) in preparedSauces"
+                    :key="`sauce-${sauceIndex}`"
                   >
                     <input
                       type="radio"
                       name="sauce"
                       :value="sauce.value"
-                      :checked="id === 0"
+                      :checked="sauceIndex === 0"
                     />
                     <span>{{ sauce.name }}</span>
                   </label>
@@ -111,8 +111,8 @@
                   <ul class="ingridients__list">
                     <li
                       class="ingridients__item"
-                      v-for="(ingredient, id) in pizza.ingredients"
-                      :key="`ingredient-${id}`"
+                      v-for="(ingredient, ingredientIndex) in pizza.ingredients"
+                      :key="`ingredient-${ingredientIndex}`"
                     >
                       <span
                         class="filling"
