@@ -1,0 +1,143 @@
+<template>
+  <div class="sheet">
+    <h2 class="title title--small sheet__title">Выберите·ингридиенты</h2>
+
+    <div class="sheet__content ingridients">
+      <div class="ingridients__sauce">
+        <p>Основной соус:</p>
+
+        <RadioButton
+          v-for="(sauce, sauceIndex) in preparedSauces"
+          :key="`sauce-${sauceIndex}`"
+          className="radio ingridients__input"
+          name="sauce"
+          :value="sauce.value"
+          :checked="currentIngridients.sauce.value === sauce.value"
+          :spanText="sauce.name"
+          @radioClick="onRadioButtonClick"
+        />
+      </div>
+
+      <div class="ingridients__filling">
+        <p>Начинка:</p>
+
+        <ul class="ingridients__list">
+          <li
+            class="ingridients__item"
+            v-for="(
+              ingredient, ingredientIndex
+            ) in currentIngridients.subIngridients"
+            :key="`ingredient-${ingredientIndex}`"
+          >
+            <span
+              class="filling"
+              :class="`filling--${ingredient.name}`"
+              :draggable="ingredient.value < 3"
+              @dragstart="onDragStart($event, ingredientIndex)"
+            >
+              {{ ingredient.text }}
+            </span>
+
+            <div class="counter counter--orange ingridients__counter">
+              <button
+                type="button"
+                class="
+                  counter__button
+                  counter__button--disabled
+                  counter__button--minus
+                "
+                @click="onCounterButtonClick($event, -1, ingredientIndex)"
+                :disabled="ingredient.value <= 0"
+              >
+                <span class="visually-hidden">Меньше</span>
+              </button>
+              <input
+                type="text"
+                name="counter"
+                class="counter__input"
+                :value="ingredient.value"
+              />
+              <button
+                type="button"
+                class="counter__button counter__button--plus"
+                @click="onCounterButtonClick($event, 1, ingredientIndex)"
+                :disabled="ingredient.value >= 3"
+              >
+                <span class="visually-hidden">Больше</span>
+              </button>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import pizza from "@/static/pizza.json";
+
+import RadioButton from "@/components/RadioButton.vue";
+
+export default {
+  name: "BuilderIngredientsSelector",
+  components: {
+    RadioButton,
+  },
+  props: {
+    currentIngridients: {
+      type: Object,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      pizza,
+    };
+  },
+  computed: {
+    preparedSauces() {
+      return this.pizza.sauces.map((sauce) => {
+        let value = "";
+
+        switch (sauce.name) {
+          case "Томатный":
+            value = "tomato";
+            break;
+          case "Сливочный":
+            value = "creamy";
+            break;
+          default:
+            value = "default";
+        }
+
+        return {
+          ...sauce,
+          value,
+        };
+      });
+    },
+  },
+  methods: {
+    onRadioButtonClick(radioValue) {
+      this.$emit("changeSauce", this.currentIngridients.sauce.name, radioValue);
+    },
+    onCounterButtonClick(evt, delta, ingridientIndex) {
+      this.$emit("changeSubingrident", ingridientIndex, delta);
+    },
+    onDragStart(evt, ingridientIndex) {
+      this.$emit("ingrideintDragged", ingridientIndex);
+    },
+  },
+};
+</script>
+
+<style lang="scss" scoped>
+@import "~@/assets/scss/mixins/mixins";
+
+@import "~@/assets/scss/layout/sheet";
+
+@import "~@/assets/scss/blocks/counter";
+@import "~@/assets/scss/blocks/filling";
+@import "~@/assets/scss/blocks/ingridients";
+@import "~@/assets/scss/blocks/title";
+</style>
