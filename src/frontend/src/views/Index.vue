@@ -1,48 +1,46 @@
 <template>
-  <div>
-    <AppLayoutHeader />
+  <main class="content">
+    <form action="#" method="post">
+      <div class="content__wrapper">
+        <h1 class="title title--big">Конструктор пиццы</h1>
 
-    <main class="content">
-      <form action="#" method="post">
-        <div class="content__wrapper">
-          <h1 class="title title--big">Конструктор пиццы</h1>
-
-          <div class="content__dough">
-            <BuilderDoughSelector
-              :currentDough="currentPizza.dough"
-              @changeDough="onPizzaUpdate"
-            />
-          </div>
-
-          <div class="content__diameter">
-            <BuilderSizeSelector
-              :currentSize="currentPizza.size"
-              @changeSize="onPizzaUpdate"
-            />
-          </div>
-
-          <div class="content__ingridients">
-            <BuilderIngredientsSelector
-              :currentIngridients="currentPizza.ingredients"
-              @changeSauce="onSauceUpdate"
-              @changeSubingrident="onSubIngridentUpdate"
-              @ingrideintDragged="onIngridientDrag"
-            />
-          </div>
-
-          <div class="content__pizza">
-            <BuilderPizzaView
-              :currentPizza="currentPizza"
-              @changeSize="onPizzaUpdate"
-              @ingridientDropped="onIngridientDrop"
-            />
-
-            <BuilderPriceCounter :currentPrice="currentPizza.price.value" />
-          </div>
+        <div class="content__dough">
+          <BuilderDoughSelector
+            :currentDough="currentPizza.dough"
+            @changeDough="onPizzaUpdate"
+          />
         </div>
-      </form>
-    </main>
-  </div>
+
+        <div class="content__diameter">
+          <BuilderSizeSelector
+            :currentSize="currentPizza.size"
+            @changeSize="onPizzaUpdate"
+          />
+        </div>
+
+        <div class="content__ingridients">
+          <BuilderIngredientsSelector
+            :currentIngridients="currentPizza.ingredients"
+            @changeSauce="onSauceUpdate"
+            @changeSubingrident="onSubIngridentUpdate"
+            @ingrideintDragged="onIngridientDrag"
+          />
+        </div>
+
+        <div class="content__pizza">
+          <BuilderPizzaView
+            :currentPizza="currentPizza"
+            @changeSize="onPizzaUpdate"
+            @ingridientDropped="onIngridientDrop"
+          />
+
+          <BuilderPriceCounter :currentPrice="currentPizza.price.value" />
+        </div>
+      </div>
+    </form>
+
+    <router-view />
+  </main>
 </template>
 
 <script>
@@ -50,7 +48,6 @@ import misc from "@/static/misc.json";
 import pizza from "@/static/pizza.json";
 import user from "@/static/user.json";
 
-import AppLayoutHeader from "@/layouts/AppLayout.vue";
 import BuilderDoughSelector from "@/modules/builder/components/BuilderDoughSelector.vue";
 import BuilderIngredientsSelector from "@/modules/builder/components/BuilderIngredientsSelector.vue";
 import BuilderPizzaView from "@/modules/builder/components/BuilderPizzaView.vue";
@@ -60,7 +57,6 @@ import BuilderSizeSelector from "@/modules/builder/components/BuilderSizeSelecto
 export default {
   name: "Index",
   components: {
-    AppLayoutHeader,
     BuilderDoughSelector,
     BuilderIngredientsSelector,
     BuilderPizzaView,

@@ -1,20 +1,22 @@
 <template>
   <header class="header">
     <div class="header__logo">
-      <a href="index.html" class="logo">
+      <router-link to="/" class="logo">
         <img
           src="@/assets/img/logo.svg"
           alt="V!U!E! Pizza logo"
           width="90"
           height="40"
         />
-      </a>
+      </router-link>
     </div>
     <div class="header__cart">
-      <a href="cart.html">0 ₽</a>
+      <router-link to="/cart">0 ₽</router-link>
     </div>
     <div class="header__user">
-      <a href="#" class="header__login"><span>Войти</span></a>
+      <router-link to="/login" class="header__login"
+        ><span>Войти</span></router-link
+      >
     </div>
   </header>
 </template>
