@@ -32,6 +32,9 @@
 </template>
 
 <script>
+import { mapMutations } from "vuex";
+import { UPDATE_PIZZA } from "@/store/mutation-types.js";
+
 export default {
   name: "BuilderPizzaView",
   props: {
@@ -56,8 +59,14 @@ export default {
     },
   },
   methods: {
+    ...mapMutations("Builder", {
+      handelPizzaUpdate: UPDATE_PIZZA,
+    }),
     onTextInputChange(evt) {
-      this.$emit("changeTitle", this.currentPizza.title.name, evt.target.value);
+      this.handelPizzaUpdate({
+        key: this.currentPizza.title.name,
+        value: evt.target.value,
+      });
     },
     onDrop() {
       this.$emit("ingridientDropped");
