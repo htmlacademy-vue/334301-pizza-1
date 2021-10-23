@@ -74,6 +74,12 @@
 </template>
 
 <script>
+import { mapMutations } from "vuex";
+import {
+  UPDATE_PIZZA_SAUSE,
+  UPDATE_PIZZA_SUBINGRIDIENT,
+} from "@/store/mutation-types.js";
+
 import pizza from "@/static/pizza.json";
 
 import RadioButton from "@/components/RadioButton.vue";
@@ -118,11 +124,16 @@ export default {
     },
   },
   methods: {
+    ...mapMutations("Builder", {
+      handelSauceUpdate: UPDATE_PIZZA_SAUSE,
+      handelSubIngridentUpdate: UPDATE_PIZZA_SUBINGRIDIENT,
+    }),
     onRadioButtonClick(radioValue) {
-      this.$emit("changeSauce", this.currentIngridients.sauce.name, radioValue);
+      const sauseName = this.currentIngridients.sauce.name;
+      this.handelSauceUpdate({ key: sauseName, value: radioValue });
     },
     onCounterButtonClick(evt, delta, ingridientIndex) {
-      this.$emit("changeSubingrident", ingridientIndex, delta);
+      this.handelSubIngridentUpdate({ ingridientIndex, delta });
     },
     onDragStart(evt, ingridientIndex) {
       this.$emit("ingrideintDragged", ingridientIndex);

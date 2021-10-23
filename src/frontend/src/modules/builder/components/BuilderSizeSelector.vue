@@ -18,6 +18,10 @@
 </template>
 
 <script>
+import { mapMutations } from "vuex";
+
+import { UPDATE_PIZZA } from "@/store/mutation-types.js";
+
 import pizza from "@/static/pizza.json";
 
 import RadioButton from "@/components/RadioButton.vue";
@@ -65,8 +69,11 @@ export default {
     },
   },
   methods: {
+    ...mapMutations("Builder", {
+      handelPizzaUpdate: UPDATE_PIZZA,
+    }),
     onRadioButtonClick(radioValue) {
-      this.$emit("changeSize", this.currentSize.name, radioValue);
+      this.handelPizzaUpdate({ key: this.currentSize.name, value: radioValue });
     },
   },
 };
