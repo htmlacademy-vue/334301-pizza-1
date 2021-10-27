@@ -1,5 +1,5 @@
 <template>
-  <label :class="radioClass" @click="onRaidoButtonClick">
+  <label :class="className" @click="onRaidoButtonClick">
     <input
       type="radio"
       :name="name"
@@ -25,7 +25,7 @@ export default {
       required: true,
     },
     value: {
-      type: String,
+      type: Number,
       required: true,
     },
     checked: {
@@ -43,14 +43,9 @@ export default {
       default: "",
     },
   },
-  computed: {
-    radioClass() {
-      return this.className;
-    },
-  },
   methods: {
-    onRaidoButtonClick(evt) {
-      this.$emit("radioClick", evt.target.value);
+    onRaidoButtonClick() {
+      this.$emit("radioClick", this.value);
     },
   },
 };

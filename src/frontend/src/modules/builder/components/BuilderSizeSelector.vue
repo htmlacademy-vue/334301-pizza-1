@@ -11,18 +11,16 @@
         :value="size.value"
         :checked="size.value === currentSize.value"
         :spanText="size.name"
-        @radioClick="onRadioButtonClick"
+        @radioClick="onRadioButtonClick($event, size.value)"
       />
     </div>
   </div>
 </template>
 
 <script>
-import { mapMutations } from "vuex";
+import { mapState, mapMutations } from "vuex";
 
 import { UPDATE_PIZZA } from "@/store/mutation-types.js";
-
-import pizza from "@/static/pizza.json";
 
 import RadioButton from "@/components/RadioButton.vue";
 
@@ -37,29 +35,11 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {
-      pizza,
-    };
-  },
   computed: {
+    ...mapState("Builder", ["pizzaSchema"]),
     preparedSizes() {
-      return this.pizza.sizes.map((size) => {
-        let value = "";
-
-        switch (size.multiplier) {
-          case 1:
-            value = "small";
-            break;
-          case 2:
-            value = "normal";
-            break;
-          case 3:
-            value = "big";
-            break;
-          default:
-            value = "default";
-        }
+      return this.pizzaSchema.sizes.map((size) => {
+        let value = size.id;
 
         return {
           ...size,
@@ -72,7 +52,7 @@ export default {
     ...mapMutations("Builder", {
       handelPizzaUpdate: UPDATE_PIZZA,
     }),
-    onRadioButtonClick(radioValue) {
+    onRadioButtonClick(evt, radioValue) {
       this.handelPizzaUpdate({ key: this.currentSize.name, value: radioValue });
     },
   },

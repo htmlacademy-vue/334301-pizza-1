@@ -23,6 +23,7 @@ export default {
   name: "CartPopup",
   computed: {
     ...mapState("Cart", ["popupActive"]),
+    ...mapState("Auth", ["isAuthenticated"]),
   },
   methods: {
     ...mapMutations("Builder", {
@@ -32,7 +33,11 @@ export default {
       handelCartReset: RESET_CART,
     }),
     onPopupButtonClick() {
-      this.$router.push({ path: "/orders" });
+      if (this.isAuthenticated === true) {
+        this.$router.push({ path: "/orders" });
+      } else {
+        this.$router.push({ path: "/" });
+      }
 
       this.handelBuilderReset();
       this.handelCartReset();

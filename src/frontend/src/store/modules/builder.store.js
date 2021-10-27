@@ -1,5 +1,3 @@
-import pizza from "@/static/pizza.json";
-
 import {
   UPDATE_PIZZA,
   UPDATE_PIZZA_SAUSE,
@@ -8,111 +6,30 @@ import {
   ADD_PIZZA_TO_CART,
   UPDATE_PIZZA_AT_CART,
 } from "@/store/mutation-types";
-
-const initialState = () => ({
-  currentPizza: {
-    dough: {
-      name: "dough",
-      value: "light",
-    },
-    ingredients: {
-      sauce: {
-        name: "sauce",
-        value: "tomato",
-      },
-      subIngridients: [
-        {
-          name: "mushrooms",
-          text: "Грибы",
-          value: 0,
-        },
-        {
-          name: "cheddar",
-          text: "Чеддер",
-          value: 0,
-        },
-        {
-          name: "salami",
-          text: "Салями",
-          value: 0,
-        },
-        {
-          name: "ham",
-          text: "Ветчина",
-          value: 0,
-        },
-        {
-          name: "ananas",
-          text: "Ананас",
-          value: 0,
-        },
-        {
-          name: "bacon",
-          text: "Бекон",
-          value: 0,
-        },
-        {
-          name: "onion",
-          text: "Лук",
-          value: 0,
-        },
-        {
-          name: "chile",
-          text: "Чили",
-          value: 0,
-        },
-        {
-          name: "jalapeno",
-          text: "Халапеньо",
-          value: 0,
-        },
-        {
-          name: "olives",
-          text: "Маслины",
-          value: 0,
-        },
-        {
-          name: "tomatoes",
-          text: "Томаты",
-          value: 0,
-        },
-        {
-          name: "salmon",
-          text: "Лосось",
-          value: 0,
-        },
-        {
-          name: "mozzarella",
-          text: "Моцарелла",
-          value: 0,
-        },
-        {
-          name: "parmesan",
-          text: "Пармезан",
-          value: 0,
-        },
-        {
-          name: "blue_cheese",
-          text: "Блю чиз",
-          value: 0,
-        },
-      ],
-    },
-    size: {
-      name: "size",
-      value: "small",
-    },
-    title: {
-      name: "title",
-      value: "",
-    },
-  },
-});
+import { SET_PIZZA_SCHEMA } from "../mutation-types";
 
 export default {
   namespaced: true,
-  state: initialState(),
+  state: {
+    pizzaSchema: null,
+    currentPizza: null,
+  },
   actions: {
+    async fetchBuilder({ commit }) {
+      const dough = await this.$api.dough.query();
+      const ingredients = await this.$api.ingredients.query();
+      const sauces = await this.$api.sauces.query();
+      const sizes = await this.$api.sizes.query();
+
+      const newSchema = {
+        dough,
+        ingredients,
+        sauces,
+        sizes,
+      };
+
+      commit(SET_PIZZA_SCHEMA, { newSchema });
+    },
     addToCart({ state, getters, commit, rootState }) {
       const { currentPizza } = state;
       const price = getters.calculatedPrice;
@@ -143,13 +60,14 @@ export default {
   mutations: {
     [UPDATE_PIZZA](state, payload) {
       const { key, value } = payload;
+      const { currentPizza } = state;
 
-      state.currentPizza[`${key}`].value = value;
+      currentPizza[key].value = value;
     },
     [UPDATE_PIZZA_SAUSE](state, payload) {
       const { key, value } = payload;
 
-      state.currentPizza.ingredients[`${key}`].value = value;
+      state.currentPizza.ingredients[key].value = value;
     },
     [UPDATE_PIZZA_SUBINGRIDIENT](state, payload) {
       const { ingridientIndex, delta } = payload;
@@ -162,73 +80,87 @@ export default {
           delta;
       }
     },
+    [SET_PIZZA_SCHEMA](state, payload) {
+      const { newSchema } = payload;
+      state.pizzaSchema = { ...newSchema };
+
+      const ingridients = state.pizzaSchema.ingredients.map((item) => {
+        return { ...item, value: 0 };
+      });
+
+      state.currentPizza = {
+        dough: {
+          name: "dough",
+          value: state.pizzaSchema.dough[0].id,
+        },
+        ingredients: {
+          sauce: {
+            name: "sauce",
+            value: state.pizzaSchema.sauces[0].id,
+          },
+          subIngridients: [...ingridients],
+        },
+        size: {
+          name: "size",
+          value: state.pizzaSchema.sizes[0].id,
+        },
+        title: {
+          name: "title",
+          value: "",
+        },
+      };
+    },
     [RESET_PIZZA](state) {
-      Object.assign(state, initialState());
+      const ingridients = state.pizzaSchema.ingredients.map((item) => {
+        return { ...item, value: 0 };
+      });
+
+      state.currentPizza = {
+        dough: {
+          name: "dough",
+          value: state.pizzaSchema.dough[0].id,
+        },
+        ingredients: {
+          sauce: {
+            name: "sauce",
+            value: state.pizzaSchema.sauces[0].id,
+          },
+          subIngridients: [...ingridients],
+        },
+        size: {
+          name: "size",
+          value: state.pizzaSchema.sizes[0].id,
+        },
+        title: {
+          name: "title",
+          value: "",
+        },
+      };
     },
   },
   getters: {
     calculatedPrice(state) {
       let price = 0;
-      let multipler = 1;
 
-      const { currentPizza } = state;
+      const { currentPizza, pizzaSchema } = state;
 
-      switch (currentPizza.dough.value) {
-        case "light":
-          price +=
-            pizza.dough.find((option) => option.name === "Тонкое").price || 0;
-          break;
-        case "large":
-          price +=
-            pizza.dough.find((option) => option.name === "Толстое").price || 0;
-          break;
-        default:
-          price += 0;
-      }
+      const doughPrice = pizzaSchema.dough.find(
+        (option) => option.id === currentPizza.dough.value
+      ).price;
+      price += doughPrice;
 
-      switch (currentPizza.ingredients.sauce.value) {
-        case "tomato":
-          price +=
-            pizza.sauces.find((option) => option.name === "Томатный").price ||
-            0;
-          break;
-        case "creamy":
-          price +=
-            pizza.sauces.find((option) => option.name === "Сливочный").price ||
-            0;
-          break;
-        default:
-          price += 0;
-      }
+      const saucePrice = pizzaSchema.sauces.find(
+        (option) => option.id === currentPizza.ingredients.sauce.value
+      ).price;
+      price += saucePrice;
 
       currentPizza.ingredients.subIngridients.forEach((item) => {
-        const ingridientData = pizza.ingredients.find(
-          (pizzaItem) => pizzaItem.name === item.text
-        );
-        if (ingridientData) {
-          price += ingridientData.price * item.value;
-        }
+        price += item.price * item.value;
       });
 
-      switch (currentPizza.size.value) {
-        case "small":
-          multipler =
-            pizza.sizes.find((option) => option.name === "23 см").multiplier ||
-            1;
-          break;
-        case "normal":
-          multipler =
-            pizza.sizes.find((option) => option.name === "32 см").multiplier ||
-            2;
-          break;
-        case "big":
-          multipler =
-            pizza.sizes.find((option) => option.name === "45 см").multiplier ||
-            3;
-          break;
-        default:
-          multipler = 1;
-      }
+      const multipler = pizzaSchema.sizes.find(
+        (option) => option.id === currentPizza.size.value
+      ).multiplier;
 
       return price * multipler;
     },

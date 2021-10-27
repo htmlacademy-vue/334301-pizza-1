@@ -12,7 +12,7 @@
           className="radio ingridients__input"
           name="sauce"
           :value="sauce.value"
-          :checked="currentIngridients.sauce.value === sauce.value"
+          :checked="sauce.value === currentIngridients.sauce.value"
           :spanText="sauce.name"
           @radioClick="onRadioButtonClick"
         />
@@ -31,7 +31,10 @@
           >
             <span
               class="filling"
-              :class="`filling--${ingredient.name}`"
+              :class="`filling--${ingredient.image
+                .split('/')
+                .find((item) => item.endsWith('.svg') === true)
+                .slice(0, -4)}`"
               :draggable="ingredient.value < 3"
               @dragstart="onDragStart($event, ingredientIndex)"
             >
@@ -74,7 +77,7 @@
 </template>
 
 <script>
-import { mapMutations } from "vuex";
+import { mapState, mapMutations } from "vuex";
 import {
   UPDATE_PIZZA_SAUSE,
   UPDATE_PIZZA_SUBINGRIDIENT,
@@ -101,20 +104,10 @@ export default {
     };
   },
   computed: {
+    ...mapState("Builder", ["pizzaSchema"]),
     preparedSauces() {
-      return this.pizza.sauces.map((sauce) => {
-        let value = "";
-
-        switch (sauce.name) {
-          case "Томатный":
-            value = "tomato";
-            break;
-          case "Сливочный":
-            value = "creamy";
-            break;
-          default:
-            value = "default";
-        }
+      return this.pizzaSchema.sauces.map((sauce) => {
+        const value = sauce.id;
 
         return {
           ...sauce,

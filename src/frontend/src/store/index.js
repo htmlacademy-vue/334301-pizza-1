@@ -1,12 +1,13 @@
 import Vue from "vue";
 import Vuex from "vuex";
-
+import VuexPlugins from "@/plugins/vuexPlugins";
 import modules from "@/store/modules";
 
 import {
   ADD_PIZZA_TO_CART,
   EDIT_PIZZA_FROM_CART,
   UPDATE_PIZZA_AT_CART,
+  REPEAT_ORDER,
 } from "@/store/mutation-types";
 
 Vue.use(Vuex);
@@ -17,7 +18,9 @@ export default new Vuex.Store({
   },
   actions: {
     async init({ dispatch }) {
-      dispatch("Cart/fetchMisc");
+      await dispatch("Auth/getMe");
+      await dispatch("Builder/fetchBuilder");
+      await dispatch("Cart/fetchMisc");
     },
   },
   mutations: {
@@ -38,6 +41,12 @@ export default new Vuex.Store({
 
       state.editablePizzaIndex = -1;
     },
+    [REPEAT_ORDER](state, { pizzas, misc, address }) {
+      state.Cart.pizzas = [...pizzas];
+      state.Cart.misc = [...misc];
+      state.Cart.form = { ...address };
+    },
   },
+  plugins: [VuexPlugins],
   modules,
 });

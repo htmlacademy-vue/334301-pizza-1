@@ -23,7 +23,10 @@
             class="pizza__filling"
             v-for="(ingredient, ingredientIndex) in filteredSubIngridients"
             :key="`pizza-filling-${ingredientIndex}`"
-            :class="`pizza__filling--${ingredient.name}`"
+            :class="`pizza__filling--${ingredient.image
+              .split('/')
+              .find((item) => item.endsWith('.svg') === true)
+              .slice(0, -4)}`"
           ></div>
         </div>
       </div>
@@ -32,7 +35,7 @@
 </template>
 
 <script>
-import { mapMutations } from "vuex";
+import { mapState, mapMutations } from "vuex";
 import { UPDATE_PIZZA } from "@/store/mutation-types.js";
 
 export default {
@@ -44,11 +47,18 @@ export default {
     },
   },
   computed: {
+    ...mapState("Builder", ["pizzaSchema"]),
     foundationModificator() {
-      const doughModificator =
-        this.currentPizza.dough.value === "light" ? "small" : "big";
+      const doughName = this.pizzaSchema.dough.find(
+        (item) => item.id === this.currentPizza.dough.value
+      );
+      const sauceName = this.pizzaSchema.sauces.find(
+        (item) => item.id === this.currentPizza.ingredients.sauce.value
+      );
+      const doughModificator = doughName === "Тонкое" ? "small" : "big";
+      const sauceModificator = sauceName === "Томатный" ? "tomato" : "creamy";
 
-      return `pizza--foundation--${doughModificator}-${this.currentPizza.ingredients.sauce.value}`;
+      return `pizza--foundation--${doughModificator}-${sauceModificator}`;
     },
     filteredSubIngridients() {
       return this.currentPizza.ingredients.subIngridients.filter(
