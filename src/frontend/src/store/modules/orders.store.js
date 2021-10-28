@@ -65,12 +65,15 @@ export default {
         console.log("Order delete error");
       }
     },
-    repeatOrder(
-      { getters, commit, rootState },
-      { order, pizzaSchema, miscSchema }
-    ) {
+    repeatOrder({ getters, commit, rootState }, { order }) {
       const { getPizzaPrice } = getters;
       const { addressId, orderAddress, orderMisc, orderPizzas } = order;
+      const { pizzaSchema } = rootState.Builder;
+      const { miscSchema } = rootState.Cart;
+
+      if (pizzaSchema === null || miscSchema.length === 0) {
+        return;
+      }
 
       const pizzas = orderPizzas.map((pizza) => {
         return {
@@ -156,12 +159,24 @@ export default {
     },
   },
   getters: {
-    getMisc: () => (miscData, miscSchema) => {
+    getMisc: (state, getters, rootState) => (miscData) => {
+      const { miscSchema } = rootState.Cart;
+
+      if (miscSchema.length === 0) {
+        return null;
+      }
+
       const misc = miscSchema.find((option) => option.id === miscData.miscId);
 
       return misc;
     },
-    getPizzaIngredients: () => (ingredients, pizzaSchema) => {
+    getPizzaIngredients: (state, getters, rootState) => (ingredients) => {
+      const { pizzaSchema } = rootState.Builder;
+
+      if (pizzaSchema === null) {
+        return "";
+      }
+
       return ingredients
         .map((item) => {
           return pizzaSchema.ingredients
@@ -170,8 +185,13 @@ export default {
         })
         .join(" ,");
     },
-    getPizzaSize: () => (sizeId, pizzaSchema) => {
+    getPizzaSize: (state, getters, rootState) => (sizeId) => {
       let pizzaSize = "";
+      const { pizzaSchema } = rootState.Builder;
+
+      if (pizzaSchema === null) {
+        return pizzaSize;
+      }
 
       const schemaSize = pizzaSchema.sizes.find(
         (option) => option.id === sizeId
@@ -181,8 +201,13 @@ export default {
 
       return pizzaSize;
     },
-    getPizzaDough: () => (doughId, pizzaSchema) => {
+    getPizzaDough: (state, getters, rootState) => (doughId) => {
       let pizzaDough = "";
+      const { pizzaSchema } = rootState.Builder;
+
+      if (pizzaSchema === null) {
+        return pizzaDough;
+      }
 
       const schemaDough = pizzaSchema.dough.find(
         (option) => option.id === doughId
@@ -203,8 +228,13 @@ export default {
 
       return pizzaDough;
     },
-    getPizzaSauce: () => (sauceId, pizzaSchema) => {
+    getPizzaSauce: (state, getters, rootState) => (sauceId) => {
       let pizzaSauce = "";
+      const { pizzaSchema } = rootState.Builder;
+
+      if (pizzaSchema === null) {
+        return pizzaSauce;
+      }
 
       const schemaSauce = pizzaSchema.sauces.find(
         (option) => option.id === sauceId
@@ -214,11 +244,23 @@ export default {
 
       return pizzaSauce;
     },
-    getPizzaPrice: () => (pizza, pizzaSchema) => {
+    getPizzaPrice: (state, getters, rootState) => (pizza) => {
+      const { pizzaSchema } = rootState.Builder;
+
+      if (pizzaSchema === null) {
+        return "";
+      }
+
       return calcPizzaPrice(pizza, pizzaSchema);
     },
-    getOrderPrice: (state) => (id, pizzaSchema, miscSchema) => {
+    getOrderPrice: (state, getters, rootState) => (id) => {
       const { ordersList } = state;
+      const { pizzaSchema } = rootState.Builder;
+      const { miscSchema } = rootState.Cart;
+
+      if (pizzaSchema === null || miscSchema.length === 0) {
+        return "";
+      }
 
       let orderPrice = 0;
       const order = ordersList.find((item) => item.id === id);

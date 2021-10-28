@@ -21,10 +21,10 @@
           <h2>{{ pizza.title.value }}</h2>
           <ul>
             <li>
-              {{ getPizzaSize(pizzaIndex, pizzaSchema) }} см, на
-              {{ getPizzaDough(pizzaIndex, pizzaSchema) }} тесте
+              {{ getPizzaSize(pizzaIndex) }} см, на
+              {{ getPizzaDough(pizzaIndex) }} тесте
             </li>
-            <li>Соус: {{ getPizzaSauce(pizzaIndex, pizzaSchema) }}</li>
+            <li>Соус: {{ getPizzaSauce(pizzaIndex) }}</li>
             <li>Начинка: {{ getPizzaSubIngredients(pizzaIndex) }}</li>
           </ul>
         </div>
@@ -78,7 +78,6 @@ import { UPDATE_PIZZA_CART_COUNTER } from "@/store/mutation-types.js";
 export default {
   name: "CartSheet",
   computed: {
-    ...mapState("Builder", ["pizzaSchema"]),
     ...mapState("Cart", ["pizzas"]),
     ...mapGetters("Cart", [
       "getPizzaSize",

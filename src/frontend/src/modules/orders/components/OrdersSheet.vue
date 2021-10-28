@@ -1,5 +1,5 @@
 <template>
-  <div v-if="pizzaSchema !== null && miscSchema.length !== 0">
+  <div>
     <section
       class="sheet order"
       v-for="orderInfo in ordersList"
@@ -11,13 +11,7 @@
         </div>
 
         <div class="order__sum">
-          <span>{{
-            `Сумма заказа: ${getOrderPrice(
-              orderInfo.id,
-              pizzaSchema,
-              miscSchema
-            )} ₽`
-          }}</span>
+          <span>{{ `Сумма заказа: ${getOrderPrice(orderInfo.id)} ₽` }}</span>
         </div>
 
         <div class="order__button">
@@ -59,23 +53,17 @@
               <ul>
                 <li>
                   {{
-                    `${getPizzaSize(
-                      orderPizza.sizeId,
-                      pizzaSchema
-                    )}, ${getPizzaDough(orderPizza.doughId, pizzaSchema)}`
-                  }}
-                </li>
-                <li>
-                  {{
-                    `Соус: ${getPizzaSauce(orderPizza.sauceId, pizzaSchema)}`
-                  }}
-                </li>
-                <li>
-                  {{
-                    `Начинка: ${getPizzaIngredients(
-                      orderPizza.ingredients,
-                      pizzaSchema
+                    `${getPizzaSize(orderPizza.sizeId)}, ${getPizzaDough(
+                      orderPizza.doughId
                     )}`
+                  }}
+                </li>
+                <li>
+                  {{ `Соус: ${getPizzaSauce(orderPizza.sauceId)}` }}
+                </li>
+                <li>
+                  {{
+                    `Начинка: ${getPizzaIngredients(orderPizza.ingredients)}`
                   }}
                 </li>
               </ul>
@@ -86,7 +74,7 @@
             {{
               `${
                 orderPizza.quantity > 1 ? `${orderPizza.quantity}x` : ""
-              }${getPizzaPrice(orderPizza, pizzaSchema)} ₽`
+              }${getPizzaPrice(orderPizza)} ₽`
             }}
           </p>
         </li>
@@ -98,16 +86,16 @@
           :key="`order-misc-${orderMisc.id}`"
         >
           <img
-            :src="getMisc(orderMisc, miscSchema).image"
+            :src="getMisc(orderMisc).image || ''"
             width="20"
             height="30"
-            :alt="getMisc(orderMisc, miscSchema).name"
+            :alt="getMisc(orderMisc).name || ''"
           />
           <p>
-            <span>{{ getMisc(orderMisc, miscSchema).name }}</span>
+            <span>{{ getMisc(orderMisc).name }}</span>
             <b>{{
               `${orderMisc.quantity > 1 ? `${orderMisc.quantity}x` : ""}${
-                getMisc(orderMisc, miscSchema).price
+                getMisc(orderMisc).price || ""
               } ₽`
             }}</b>
           </p>
@@ -135,8 +123,6 @@ import { mapState, mapGetters, mapActions } from "vuex";
 export default {
   name: "OrdersSheet",
   computed: {
-    ...mapState("Builder", ["pizzaSchema"]),
-    ...mapState("Cart", ["miscSchema"]),
     ...mapState("Orders", ["ordersList"]),
     ...mapGetters("Orders", [
       "getOrderPrice",
@@ -158,11 +144,7 @@ export default {
       this.handelOrderDelete(orderId);
     },
     onRepeatButtonClick(order) {
-      this.handelOrderRepeat({
-        order,
-        pizzaSchema: this.pizzaSchema,
-        miscSchema: this.miscSchema,
-      });
+      this.handelOrderRepeat({ order });
       this.$router.push({ path: "/cart" });
     },
   },

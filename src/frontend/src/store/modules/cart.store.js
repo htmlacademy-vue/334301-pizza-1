@@ -172,8 +172,9 @@ export default {
     },
   },
   getters: {
-    getPizzaSize: (state) => (id, pizzaSchema) => {
+    getPizzaSize: (state, getters, rootState) => (id) => {
       const { pizzas } = state;
+      const { pizzaSchema } = rootState.Builder;
       const pizza = pizzas[id];
       let pizzaSize = "";
 
@@ -185,8 +186,9 @@ export default {
 
       return pizzaSize;
     },
-    getPizzaDough: (state) => (id, pizzaSchema) => {
+    getPizzaDough: (state, getters, rootState) => (id) => {
       const { pizzas } = state;
+      const { pizzaSchema } = rootState.Builder;
       const pizza = pizzas[id];
       let pizzaDough = "";
 
@@ -209,8 +211,9 @@ export default {
 
       return pizzaDough;
     },
-    getPizzaSauce: (state) => (id, pizzaSchema) => {
+    getPizzaSauce: (state, getters, rootState) => (id) => {
       const { pizzas } = state;
+      const { pizzaSchema } = rootState.Builder;
       const pizza = pizzas[id];
       let pizzaSauce = "";
 
