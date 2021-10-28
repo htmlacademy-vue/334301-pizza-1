@@ -12,9 +12,9 @@
           <BuilderSizeSelector :currentSize="currentPizza.size" />
         </div>
 
-        <div class="content__ingridients">
+        <div class="content__ingredients">
           <BuilderIngredientsSelector
-            :currentIngridients="currentPizza.ingredients"
+            :currentIngredients="currentPizza.ingredients"
             @ingrideintDragged="onIngridientDrag"
           />
         </div>

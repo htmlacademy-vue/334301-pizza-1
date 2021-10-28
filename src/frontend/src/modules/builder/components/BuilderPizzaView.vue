@@ -21,7 +21,7 @@
         <div class="pizza__wrapper">
           <div
             class="pizza__filling"
-            v-for="(ingredient, ingredientIndex) in filteredSubIngridients"
+            v-for="(ingredient, ingredientIndex) in filteredSubIngredients"
             :key="`pizza-filling-${ingredientIndex}`"
             :class="`pizza__filling--${ingredient.image
               .split('/')
@@ -60,8 +60,8 @@ export default {
 
       return `pizza--foundation--${doughModificator}-${sauceModificator}`;
     },
-    filteredSubIngridients() {
-      return this.currentPizza.ingredients.subIngridients.filter(
+    filteredSubIngredients() {
+      return this.currentPizza.ingredients.subIngredients.filter(
         (ingridient) => {
           return ingridient.value > 0;
         }

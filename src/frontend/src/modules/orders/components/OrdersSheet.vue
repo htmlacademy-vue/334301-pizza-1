@@ -61,7 +61,7 @@
                 <li>{{ `Соус: ${getPizzaSauce(orderPizza.sauceId)}` }}</li>
                 <li>
                   {{
-                    `Начинка: ${getPizzaIngridients(orderPizza.ingredients)}`
+                    `Начинка: ${getPizzaIngredients(orderPizza.ingredients)}`
                   }}
                 </li>
               </ul>
@@ -124,7 +124,7 @@ export default {
     ...mapState("Orders", ["ordersList"]),
     ...mapGetters("Orders", [
       "getOrderPrice",
-      "getPizzaIngridients",
+      "getPizzaIngredients",
       "getPizzaSize",
       "getPizzaDough",
       "getPizzaSauce",

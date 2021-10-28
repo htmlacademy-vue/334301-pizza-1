@@ -25,7 +25,7 @@
               {{ getPizzaDough(pizzaIndex) }} тесте
             </li>
             <li>Соус: {{ getPizzaSauce(pizzaIndex) }}</li>
-            <li>Начинка: {{ getPizzaSubIngridients(pizzaIndex) }}</li>
+            <li>Начинка: {{ getPizzaSubIngredients(pizzaIndex) }}</li>
           </ul>
         </div>
       </div>
@@ -83,7 +83,7 @@ export default {
       "getPizzaSize",
       "getPizzaDough",
       "getPizzaSauce",
-      "getPizzaSubIngridients",
+      "getPizzaSubIngredients",
     ]),
   },
   methods: {

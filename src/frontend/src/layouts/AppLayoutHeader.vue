@@ -20,12 +20,12 @@
     </div>
     <div class="header__user" v-else>
       <router-link to="/profile">
-        <img :src="user.avatar" :alt="user.name" width="32" height="32" />
+        <picture>
+          <img :src="user.avatar" :alt="user.name" width="32" height="32" />
+        </picture>
         <span>{{ user.name }}</span>
       </router-link>
-      <a href="#" class="header__logout" @click.prevent="onLogoutClick">
-        <span>Выйти</span>
-      </a>
+      <a href="#" class="header__logout"><span>Выйти</span></a>
     </div>
   </header>
 </template>

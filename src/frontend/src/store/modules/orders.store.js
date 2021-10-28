@@ -103,7 +103,7 @@ export default {
               name: "sauce",
               value: pizza.sauceId,
             },
-            subIngridients: [
+            subIngredients: [
               ...pizzaSchema.ingredients.map((item) => {
                 return {
                   ...item,
@@ -175,7 +175,7 @@ export default {
 
       return misc;
     },
-    getPizzaIngridients: (state) => (ingredients) => {
+    getPizzaIngredients: (state) => (ingredients) => {
       const { pizzaSchema } = state;
 
       return ingredients

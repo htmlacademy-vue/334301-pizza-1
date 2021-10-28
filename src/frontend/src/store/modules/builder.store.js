@@ -73,10 +73,10 @@ export default {
       const { ingridientIndex, delta } = payload;
 
       const ingridientValue =
-        state.currentPizza.ingredients.subIngridients[ingridientIndex].value;
+        state.currentPizza.ingredients.subIngredients[ingridientIndex].value;
 
       if (ingridientValue + delta <= 3 || ingridientValue + delta >= 0) {
-        state.currentPizza.ingredients.subIngridients[ingridientIndex].value +=
+        state.currentPizza.ingredients.subIngredients[ingridientIndex].value +=
           delta;
       }
     },
@@ -84,7 +84,7 @@ export default {
       const { newSchema } = payload;
       state.pizzaSchema = { ...newSchema };
 
-      const ingridients = state.pizzaSchema.ingredients.map((item) => {
+      const ingredients = state.pizzaSchema.ingredients.map((item) => {
         return { ...item, value: 0 };
       });
 
@@ -98,7 +98,7 @@ export default {
             name: "sauce",
             value: state.pizzaSchema.sauces[0].id,
           },
-          subIngridients: [...ingridients],
+          subIngredients: [...ingredients],
         },
         size: {
           name: "size",
@@ -111,7 +111,7 @@ export default {
       };
     },
     [RESET_PIZZA](state) {
-      const ingridients = state.pizzaSchema.ingredients.map((item) => {
+      const ingredients = state.pizzaSchema.ingredients.map((item) => {
         return { ...item, value: 0 };
       });
 
@@ -125,7 +125,7 @@ export default {
             name: "sauce",
             value: state.pizzaSchema.sauces[0].id,
           },
-          subIngridients: [...ingridients],
+          subIngredients: [...ingredients],
         },
         size: {
           name: "size",
@@ -154,7 +154,7 @@ export default {
       ).price;
       price += saucePrice;
 
-      currentPizza.ingredients.subIngridients.forEach((item) => {
+      currentPizza.ingredients.subIngredients.forEach((item) => {
         price += item.price * item.value;
       });
 
@@ -170,7 +170,7 @@ export default {
       let canOrder = true;
       let haveAtLeastOneIngridient = false;
 
-      for (let subIngridient of currentPizza.ingredients.subIngridients) {
+      for (let subIngridient of currentPizza.ingredients.subIngredients) {
         if (subIngridient.value !== 0) {
           haveAtLeastOneIngridient = true;
 

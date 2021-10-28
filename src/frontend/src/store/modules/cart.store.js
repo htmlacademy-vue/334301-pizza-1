@@ -75,7 +75,7 @@ export default {
           doughId: pizza.dough.value,
           sizeId: pizza.size.value,
           quantity: pizza.counter,
-          ingredients: pizza.ingredients.subIngridients
+          ingredients: pizza.ingredients.subIngredients
             .filter((item) => item.value > 0)
             .map((item) => {
               return {
@@ -228,10 +228,10 @@ export default {
 
       return pizzaSauce;
     },
-    getPizzaSubIngridients: (state) => (id) => {
+    getPizzaSubIngredients: (state) => (id) => {
       const pizza = state.pizzas[id];
 
-      const subIngridients = pizza.ingredients.subIngridients
+      const subIngredients = pizza.ingredients.subIngredients
         .filter((subIngridient) => subIngridient.value > 0)
         .map((subIngridient) => {
           if (subIngridient.value > 0) {
@@ -242,7 +242,7 @@ export default {
         })
         .join(", ");
 
-      return subIngridients;
+      return subIngredients;
     },
     totalPrice(state) {
       let price = 0;
