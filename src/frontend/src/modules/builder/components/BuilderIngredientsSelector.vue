@@ -2,51 +2,47 @@
   <div class="sheet">
     <h2 class="title title--small sheet__title">Выберите·ингридиенты</h2>
 
-    <div class="sheet__content ingridients">
-      <div class="ingridients__sauce">
+    <div class="sheet__content ingredients">
+      <div class="ingredients__sauce">
         <p>Основной соус:</p>
 
         <RadioButton
           v-for="(sauce, sauceIndex) in preparedSauces"
           :key="`sauce-${sauceIndex}`"
-          className="radio ingridients__input"
+          class="radio ingredients__input"
           name="sauce"
           :value="sauce.value"
-          :checked="currentIngridients.sauce.value === sauce.value"
+          :checked="sauce.value === currentIngredients.sauce.value"
           :spanText="sauce.name"
           @radioClick="onRadioButtonClick"
         />
       </div>
 
-      <div class="ingridients__filling">
+      <div class="ingredients__filling">
         <p>Начинка:</p>
 
-        <ul class="ingridients__list">
+        <ul class="ingredients__list">
           <li
-            class="ingridients__item"
+            class="ingredients__item"
             v-for="(
               ingredient, ingredientIndex
-            ) in currentIngridients.subIngridients"
+            ) in currentIngredients.subIngredients"
             :key="`ingredient-${ingredientIndex}`"
           >
             <span
-              class="filling"
-              :class="`filling--${ingredient.name}`"
+              :class="ingredientFillingClass(ingredient.image)"
               :draggable="ingredient.value < 3"
-              @dragstart="onDragStart($event, ingredientIndex)"
+              @dragstart="onDragStart(ingredientIndex)"
             >
-              {{ ingredient.text }}
+              {{ ingredient.name }}
             </span>
 
-            <div class="counter counter--orange ingridients__counter">
+            <div class="counter counter--orange ingredients__counter">
               <button
                 type="button"
-                class="
-                  counter__button
-                  counter__button--disabled
-                  counter__button--minus
-                "
-                @click="onCounterButtonClick($event, -1, ingredientIndex)"
+                class="counter__button counter__button--minus"
+                :class="{ 'counter__button--disabled': ingredient.value <= 0 }"
+                @click="onCounterButtonClick(-1, ingredientIndex)"
                 :disabled="ingredient.value <= 0"
               >
                 <span class="visually-hidden">Меньше</span>
@@ -60,7 +56,8 @@
               <button
                 type="button"
                 class="counter__button counter__button--plus"
-                @click="onCounterButtonClick($event, 1, ingredientIndex)"
+                :class="{ 'counter__button--disabled': ingredient.value >= 3 }"
+                @click="onCounterButtonClick(1, ingredientIndex)"
                 :disabled="ingredient.value >= 3"
               >
                 <span class="visually-hidden">Больше</span>
@@ -74,7 +71,7 @@
 </template>
 
 <script>
-import { mapMutations } from "vuex";
+import { mapState, mapMutations } from "vuex";
 import {
   UPDATE_PIZZA_SAUSE,
   UPDATE_PIZZA_SUBINGRIDIENT,
@@ -90,7 +87,7 @@ export default {
     RadioButton,
   },
   props: {
-    currentIngridients: {
+    currentIngredients: {
       type: Object,
       required: true,
     },
@@ -101,20 +98,10 @@ export default {
     };
   },
   computed: {
+    ...mapState("Builder", ["pizzaSchema"]),
     preparedSauces() {
-      return this.pizza.sauces.map((sauce) => {
-        let value = "";
-
-        switch (sauce.name) {
-          case "Томатный":
-            value = "tomato";
-            break;
-          case "Сливочный":
-            value = "creamy";
-            break;
-          default:
-            value = "default";
-        }
+      return this.pizzaSchema.sauces.map((sauce) => {
+        const value = sauce.id;
 
         return {
           ...sauce,
@@ -129,14 +116,22 @@ export default {
       handelSubIngridentUpdate: UPDATE_PIZZA_SUBINGRIDIENT,
     }),
     onRadioButtonClick(radioValue) {
-      const sauseName = this.currentIngridients.sauce.name;
+      const sauseName = this.currentIngredients.sauce.name;
       this.handelSauceUpdate({ key: sauseName, value: radioValue });
     },
-    onCounterButtonClick(evt, delta, ingridientIndex) {
+    onCounterButtonClick(delta, ingridientIndex) {
       this.handelSubIngridentUpdate({ ingridientIndex, delta });
     },
-    onDragStart(evt, ingridientIndex) {
+    onDragStart(ingridientIndex) {
       this.$emit("ingrideintDragged", ingridientIndex);
+    },
+    ingredientFillingClass(ingredientImage) {
+      const modificator = ingredientImage
+        .split("/")
+        .find((item) => item.endsWith(".svg") === true)
+        .slice(0, -4);
+
+      return `filling filling--${modificator}`;
     },
   },
 };
@@ -149,6 +144,6 @@ export default {
 
 @import "~@/assets/scss/blocks/counter";
 @import "~@/assets/scss/blocks/filling";
-@import "~@/assets/scss/blocks/ingridients";
+@import "~@/assets/scss/blocks/ingredients";
 @import "~@/assets/scss/blocks/title";
 </style>

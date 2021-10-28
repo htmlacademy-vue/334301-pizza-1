@@ -13,7 +13,13 @@
     </div>
 
     <div class="footer__submit">
-      <button type="submit" class="button" @click.prevent="onSubmitButtonClick">
+      <button
+        type="submit"
+        class="button"
+        @click.prevent="onSubmitButtonClick"
+        :disabled="!canSubmit"
+        :class="{ 'button--disabled': !canSubmit }"
+      >
         Оформить заказ
       </button>
     </div>
@@ -21,12 +27,43 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
+import { mapState, mapGetters, mapActions } from "vuex";
 
 export default {
   name: "CartFooter",
   computed: {
+    ...mapState("Cart", ["pizzas", "form"]),
     ...mapGetters("Cart", ["totalPrice"]),
+    canSubmit() {
+      let canSubmit = true;
+      if (this.pizzas.length === 0) {
+        return false;
+      }
+
+      this.pizzas.forEach((pizza) => {
+        if (pizza.counter === 0) {
+          canSubmit = false;
+        }
+      });
+
+      if (
+        this.form.activeDeliveryOption === "pickup" &&
+        this.form.tel.split(" ").join("").length === 0
+      ) {
+        canSubmit = false;
+      }
+
+      if (
+        this.form.activeDeliveryOption !== "pickup" &&
+        (this.form.tel.split(" ").join("").length === 0 ||
+          this.form.street.split(" ").join("").length === 0 ||
+          this.form.house.split(" ").join("").length === 0)
+      ) {
+        canSubmit = false;
+      }
+
+      return canSubmit;
+    },
   },
   methods: {
     ...mapActions("Cart", {

@@ -6,7 +6,7 @@
       <RadioButton
         v-for="(dough, doughIndex) in preparedDough"
         :key="`dough-${doughIndex}`"
-        :className="`dough__input dough__input--${dough.value}`"
+        :class="prepareRadioClass(dough.name)"
         name="dough"
         :value="dough.value"
         :checked="dough.value === currentDough.value"
@@ -19,10 +19,8 @@
 </template>
 
 <script>
-import { mapMutations } from "vuex";
+import { mapState, mapMutations } from "vuex";
 import { UPDATE_PIZZA } from "@/store/mutation-types.js";
-
-import pizza from "@/static/pizza.json";
 
 import RadioButton from "@/components/RadioButton.vue";
 
@@ -37,26 +35,11 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {
-      pizza,
-    };
-  },
   computed: {
+    ...mapState("Builder", ["pizzaSchema"]),
     preparedDough() {
-      return this.pizza.dough.map((dough) => {
-        let value = "";
-
-        switch (dough.name) {
-          case "Тонкое":
-            value = "light";
-            break;
-          case "Толстое":
-            value = "large";
-            break;
-          default:
-            value = "default";
-        }
+      return this.pizzaSchema.dough.map((dough) => {
+        let value = dough.id;
 
         return {
           ...dough,
@@ -74,6 +57,11 @@ export default {
         key: this.currentDough.name,
         value: radioValue,
       });
+    },
+    prepareRadioClass(doughName) {
+      const modificator = doughName === "Тонкое" ? "light" : "large";
+
+      return `dough__input dough__input--${modificator}`;
     },
   },
 };

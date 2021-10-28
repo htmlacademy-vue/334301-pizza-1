@@ -1,7 +1,7 @@
 <template>
   <main class="content">
     <form action="#" method="post">
-      <div class="content__wrapper">
+      <div class="content__wrapper" v-if="currentPizza !== null">
         <h1 class="title title--big">Конструктор пиццы</h1>
 
         <div class="content__dough">
@@ -12,9 +12,9 @@
           <BuilderSizeSelector :currentSize="currentPizza.size" />
         </div>
 
-        <div class="content__ingridients">
+        <div class="content__ingredients">
           <BuilderIngredientsSelector
-            :currentIngridients="currentPizza.ingredients"
+            :currentIngredients="currentPizza.ingredients"
             @ingrideintDragged="onIngridientDrag"
           />
         </div>
@@ -30,18 +30,12 @@
       </div>
     </form>
 
-    <!-- <BuilderPopup /> -->
-
     <router-view />
   </main>
 </template>
 
 <script>
 import { mapState, mapMutations } from "vuex";
-
-import misc from "@/static/misc.json";
-import pizza from "@/static/pizza.json";
-import user from "@/static/user.json";
 
 import BuilderDoughSelector from "@/modules/builder/components/BuilderDoughSelector.vue";
 import BuilderIngredientsSelector from "@/modules/builder/components/BuilderIngredientsSelector.vue";
@@ -62,9 +56,6 @@ export default {
   },
   data() {
     return {
-      misc,
-      pizza,
-      user,
       draggedIngridientIndex: -1,
     };
   },

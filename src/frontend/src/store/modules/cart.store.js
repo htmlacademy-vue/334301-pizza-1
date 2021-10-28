@@ -1,5 +1,3 @@
-import miscData from "@/static/misc.json";
-
 import {
   RESET_CART,
   UPDATE_PIZZA_CART_COUNTER,
@@ -12,6 +10,7 @@ import {
 
 const initialState = () => ({
   pizzas: [],
+  miscSchema: [],
   misc: [],
   form: {
     activeDeliveryOption: "pickup",
@@ -27,14 +26,17 @@ export default {
   namespaced: true,
   state: initialState(),
   actions: {
-    fetchMisc({ commit }) {
-      const data = miscData.map((item) => {
+    async fetchMisc({ commit }) {
+      const miscSchema = await this.$api.misc.query();
+
+      const data = miscSchema.map((item) => {
         return {
           ...item,
           counter: 0,
         };
       });
       commit(SET_CART_MISC, {
+        miscSchema,
         data,
       });
     },
@@ -50,40 +52,69 @@ export default {
         { root: true }
       );
     },
-    submitForm({ state, commit }) {
+    async submitForm({ state, commit, rootState }) {
       const { pizzas, misc, form } = state;
 
-      if (pizzas.length === 0) {
-        return;
-      }
+      const preparedPizzas = pizzas.map((pizza) => {
+        return {
+          name: pizza.title.value,
+          sauceId: pizza.ingredients.sauce.value,
+          doughId: pizza.dough.value,
+          sizeId: pizza.size.value,
+          quantity: pizza.counter,
+          ingredients: pizza.ingredients.subIngredients
+            .filter((item) => item.value > 0)
+            .map((item) => {
+              return {
+                ingredientId: item.id,
+                quantity: item.value,
+              };
+            }),
+        };
+      });
 
-      const data = {
-        pizzaData: [...pizzas],
-        miscData: [...misc],
-        formData: { ...form },
+      const preparedMisc = misc
+        .filter((item) => item.counter > 0)
+        .map((item) => {
+          return {
+            miscId: item.id,
+            quantity: item.counter,
+          };
+        });
+
+      const postData = {
+        userId: rootState.Auth.user.id,
+        pizzas: preparedPizzas,
+        misc: preparedMisc,
+        phone: form.tel,
+        address: {},
       };
 
-      // W.I.P.
-      console.log(data);
+      if (rootState.Auth.isAuthenticated === false) {
+        postData.userId = null;
+      }
 
-      // W.I.P.
       switch (form.activeDeliveryOption) {
         case "pickup":
-          if (form.tel.split(" ").join("").length !== 0) {
-            console.log("Оформлен заказ с самовывозом");
-          }
+          postData.address = null;
+          break;
+
+        case "new":
+          postData.address = {
+            street: form.street,
+            building: form.house,
+            flat: form.apartment,
+          };
           break;
 
         default:
-          if (
-            form.tel.split(" ").join("").length !== 0 &&
-            form.street.split(" ").join("").length !== 0 &&
-            form.house.split(" ").join("").length !== 0
-          ) {
-            console.log("Оформлен заказ с адресом");
-          }
+          postData.address = {
+            id: form.activeDeliveryOption,
+          };
           break;
       }
+
+      await this.$api.orders.post(postData);
 
       commit(UPDATE_CART_POPUP_STATE, true);
     },
@@ -92,7 +123,14 @@ export default {
     [RESET_CART](state) {
       Object.assign(state, {
         pizzas: [],
-        misc: [...state.misc],
+        misc: [
+          ...state.miscSchema.map((item) => {
+            return {
+              ...item,
+              counter: 0,
+            };
+          }),
+        ],
         form: {
           activeDeliveryOption: "pickup",
           tel: "",
@@ -111,8 +149,9 @@ export default {
       }
     },
     [SET_CART_MISC](state, payload) {
-      const { data } = payload;
+      const { miscSchema, data } = payload;
 
+      state.miscSchema = [...miscSchema];
       state.misc = [...data];
     },
     [UPDATE_CART_MISC_COUNTER](state, payload) {
@@ -132,75 +171,74 @@ export default {
     },
   },
   getters: {
-    getPizzaSize: (state) => (id) => {
-      const pizza = state.pizzas[id];
+    getPizzaSize: (state, getters, rootState) => (id) => {
+      const { pizzas } = state;
+      const { pizzaSchema } = rootState.Builder;
+      const pizza = pizzas[id];
       let pizzaSize = "";
 
-      switch (pizza.size.value) {
-        case "small":
-          pizzaSize = "23";
-          break;
-        case "normal":
-          pizzaSize = "32";
-          break;
-        case "big":
-          pizzaSize = "45";
-          break;
-        default:
-          pizzaSize = "";
-      }
+      const schemaSize = pizzaSchema.sizes.find(
+        (option) => option.id === pizza.size.value
+      );
+
+      pizzaSize = schemaSize ? schemaSize.name : "";
 
       return pizzaSize;
     },
-    getPizzaDough: (state) => (id) => {
-      const pizza = state.pizzas[id];
+    getPizzaDough: (state, getters, rootState) => (id) => {
+      const { pizzas } = state;
+      const { pizzaSchema } = rootState.Builder;
+      const pizza = pizzas[id];
       let pizzaDough = "";
 
-      switch (pizza.dough.value) {
-        case "light":
-          pizzaDough = "тонком";
-          break;
-        case "large":
-          pizzaDough = "толстом";
-          break;
-        default:
-          pizzaDough = "";
+      const schemaDough = pizzaSchema.dough.find(
+        (option) => option.id === pizza.dough.value
+      );
+
+      if (schemaDough) {
+        switch (schemaDough.name) {
+          case "Тонкое":
+            pizzaDough = "тонком";
+            break;
+          case "Толстое":
+            pizzaDough = "толстом";
+            break;
+          default:
+            pizzaDough = "";
+        }
       }
 
       return pizzaDough;
     },
-    getPizzaSauce: (state) => (id) => {
-      const pizza = state.pizzas[id];
+    getPizzaSauce: (state, getters, rootState) => (id) => {
+      const { pizzas } = state;
+      const { pizzaSchema } = rootState.Builder;
+      const pizza = pizzas[id];
       let pizzaSauce = "";
 
-      switch (pizza.ingredients.sauce.value) {
-        case "tomato":
-          pizzaSauce = "томатный";
-          break;
-        case "creamy":
-          pizzaSauce = "сливочный";
-          break;
-        default:
-          pizzaSauce = "";
-      }
+      const schemaSauce = pizzaSchema.sauces.find(
+        (option) => option.id === pizza.ingredients.sauce.value
+      );
+
+      pizzaSauce = schemaSauce ? schemaSauce.name.toLowerCase() : "";
 
       return pizzaSauce;
     },
-    getPizzaSubIngridients: (state) => (id) => {
+    getPizzaSubIngredients: (state) => (id) => {
       const pizza = state.pizzas[id];
 
-      const subIngridients = pizza.ingredients.subIngridients
+      const subIngredients = pizza.ingredients.subIngredients
         .filter((subIngridient) => subIngridient.value > 0)
         .map((subIngridient) => {
           if (subIngridient.value > 0) {
-            return subIngridient.text.toLowerCase();
+            return subIngridient.name.toLowerCase();
           } else {
             return null;
           }
         })
         .join(", ");
 
-      return subIngridients;
+      return subIngredients;
     },
     totalPrice(state) {
       let price = 0;

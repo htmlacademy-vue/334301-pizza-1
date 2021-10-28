@@ -20,10 +20,9 @@
       <div class="pizza" :class="foundationModificator">
         <div class="pizza__wrapper">
           <div
-            class="pizza__filling"
-            v-for="(ingredient, ingredientIndex) in filteredSubIngridients"
+            v-for="(ingredient, ingredientIndex) in filteredSubIngredients"
             :key="`pizza-filling-${ingredientIndex}`"
-            :class="`pizza__filling--${ingredient.name}`"
+            :class="pizzaFillingClass(ingredient.image, ingredient.value)"
           ></div>
         </div>
       </div>
@@ -32,7 +31,7 @@
 </template>
 
 <script>
-import { mapMutations } from "vuex";
+import { mapState, mapMutations } from "vuex";
 import { UPDATE_PIZZA } from "@/store/mutation-types.js";
 
 export default {
@@ -44,14 +43,21 @@ export default {
     },
   },
   computed: {
+    ...mapState("Builder", ["pizzaSchema"]),
     foundationModificator() {
-      const doughModificator =
-        this.currentPizza.dough.value === "light" ? "small" : "big";
+      const doughName = this.pizzaSchema.dough.find(
+        (item) => item.id === this.currentPizza.dough.value
+      );
+      const sauceName = this.pizzaSchema.sauces.find(
+        (item) => item.id === this.currentPizza.ingredients.sauce.value
+      );
+      const doughModificator = doughName === "Тонкое" ? "small" : "big";
+      const sauceModificator = sauceName === "Томатный" ? "tomato" : "creamy";
 
-      return `pizza--foundation--${doughModificator}-${this.currentPizza.ingredients.sauce.value}`;
+      return `pizza--foundation--${doughModificator}-${sauceModificator}`;
     },
-    filteredSubIngridients() {
-      return this.currentPizza.ingredients.subIngridients.filter(
+    filteredSubIngredients() {
+      return this.currentPizza.ingredients.subIngredients.filter(
         (ingridient) => {
           return ingridient.value > 0;
         }
@@ -70,6 +76,27 @@ export default {
     },
     onDrop() {
       this.$emit("ingridientDropped");
+    },
+    pizzaFillingClass(ingredientImage, ingridientValue) {
+      const firstModificator = ingredientImage
+        .split("/")
+        .find((item) => item.endsWith(".svg") === true)
+        .slice(0, -4);
+
+      let secondModificator = "";
+      switch (ingridientValue) {
+        case 2:
+          secondModificator = " pizza__filling--second";
+          break;
+        case 3:
+          secondModificator = " pizza__filling--third";
+          break;
+        default:
+          secondModificator = "";
+          break;
+      }
+
+      return `pizza__filling pizza__filling--${firstModificator}${secondModificator}`;
     },
   },
 };

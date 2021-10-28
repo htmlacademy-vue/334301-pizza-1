@@ -25,7 +25,7 @@
               {{ getPizzaDough(pizzaIndex) }} тесте
             </li>
             <li>Соус: {{ getPizzaSauce(pizzaIndex) }}</li>
-            <li>Начинка: {{ getPizzaSubIngridients(pizzaIndex) }}</li>
+            <li>Начинка: {{ getPizzaSubIngredients(pizzaIndex) }}</li>
           </ul>
         </div>
       </div>
@@ -34,7 +34,7 @@
         <button
           type="button"
           class="counter__button counter__button--minus"
-          @click="onCounterButtonClick($event, -1, pizzaIndex)"
+          @click="onCounterButtonClick(-1, pizzaIndex)"
           :disabled="pizza.counter <= 0"
         >
           <span class="visually-hidden">Меньше</span>
@@ -48,7 +48,7 @@
         <button
           type="button"
           class="counter__button counter__button--plus counter__button--orange"
-          @click="onCounterButtonClick($event, 1, pizzaIndex)"
+          @click="onCounterButtonClick(1, pizzaIndex)"
         >
           <span class="visually-hidden">Больше</span>
         </button>
@@ -62,7 +62,7 @@
         <button
           type="button"
           class="cart-list__edit"
-          @click="onEditButtonClick($event, pizzaIndex)"
+          @click="onEditButtonClick(pizzaIndex)"
         >
           Изменить
         </button>
@@ -83,7 +83,7 @@ export default {
       "getPizzaSize",
       "getPizzaDough",
       "getPizzaSauce",
-      "getPizzaSubIngridients",
+      "getPizzaSubIngredients",
     ]),
   },
   methods: {
@@ -93,10 +93,10 @@ export default {
     ...mapMutations("Cart", {
       handelPizzaCounterUpdate: UPDATE_PIZZA_CART_COUNTER,
     }),
-    onCounterButtonClick(evt, delta, index) {
+    onCounterButtonClick(delta, index) {
       this.handelPizzaCounterUpdate({ pizzaIndex: index, delta });
     },
-    onEditButtonClick(evt, pizzaIndex) {
+    onEditButtonClick(pizzaIndex) {
       this.handelPizzaEdit(pizzaIndex);
       this.$router.push({ path: "/" });
     },
