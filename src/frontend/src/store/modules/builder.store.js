@@ -170,8 +170,8 @@ export default {
       let canOrder = true;
       let haveAtLeastOneIngridient = false;
 
-      for (let subIngridient of currentPizza.ingredients.subIngredients) {
-        if (subIngridient.value !== 0) {
+      for (let subIngredient of currentPizza.ingredients.subIngredients) {
+        if (subIngredient.value !== 0) {
           haveAtLeastOneIngridient = true;
 
           break;

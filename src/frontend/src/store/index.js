@@ -17,10 +17,10 @@ export default new Vuex.Store({
     editablePizzaIndex: -1,
   },
   actions: {
-    async init({ dispatch }) {
-      await dispatch("Auth/getMe");
-      await dispatch("Builder/fetchBuilder");
-      await dispatch("Cart/fetchMisc");
+    init({ dispatch }) {
+      dispatch("Auth/getMe");
+      dispatch("Builder/fetchBuilder");
+      dispatch("Cart/fetchMisc");
     },
   },
   mutations: {

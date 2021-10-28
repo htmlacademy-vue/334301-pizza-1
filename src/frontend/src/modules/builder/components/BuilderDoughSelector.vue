@@ -6,9 +6,7 @@
       <RadioButton
         v-for="(dough, doughIndex) in preparedDough"
         :key="`dough-${doughIndex}`"
-        :className="`dough__input dough__input--${
-          dough.name === 'Тонкое' ? 'light' : 'large'
-        }`"
+        :class="prepareRadioClass(dough.name)"
         name="dough"
         :value="dough.value"
         :checked="dough.value === currentDough.value"
@@ -59,6 +57,11 @@ export default {
         key: this.currentDough.name,
         value: radioValue,
       });
+    },
+    prepareRadioClass(doughName) {
+      const modificator = doughName === "Тонкое" ? "light" : "large";
+
+      return `dough__input dough__input--${modificator}`;
     },
   },
 };

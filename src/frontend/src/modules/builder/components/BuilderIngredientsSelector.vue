@@ -9,7 +9,7 @@
         <RadioButton
           v-for="(sauce, sauceIndex) in preparedSauces"
           :key="`sauce-${sauceIndex}`"
-          className="radio ingredients__input"
+          class="radio ingredients__input"
           name="sauce"
           :value="sauce.value"
           :checked="sauce.value === currentIngredients.sauce.value"
@@ -30,13 +30,9 @@
             :key="`ingredient-${ingredientIndex}`"
           >
             <span
-              class="filling"
-              :class="`filling--${ingredient.image
-                .split('/')
-                .find((item) => item.endsWith('.svg') === true)
-                .slice(0, -4)}`"
+              :class="ingredientFillingClass(ingredient.image)"
               :draggable="ingredient.value < 3"
-              @dragstart="onDragStart($event, ingredientIndex)"
+              @dragstart="onDragStart(ingredientIndex)"
             >
               {{ ingredient.text }}
             </span>
@@ -44,12 +40,9 @@
             <div class="counter counter--orange ingredients__counter">
               <button
                 type="button"
-                class="
-                  counter__button
-                  counter__button--disabled
-                  counter__button--minus
-                "
-                @click="onCounterButtonClick($event, -1, ingredientIndex)"
+                class="counter__button counter__button--minus"
+                :class="{ 'counter__button--disabled': ingredient.value <= 0 }"
+                @click="onCounterButtonClick(-1, ingredientIndex)"
                 :disabled="ingredient.value <= 0"
               >
                 <span class="visually-hidden">Меньше</span>
@@ -63,7 +56,8 @@
               <button
                 type="button"
                 class="counter__button counter__button--plus"
-                @click="onCounterButtonClick($event, 1, ingredientIndex)"
+                :class="{ 'counter__button--disabled': ingredient.value >= 3 }"
+                @click="onCounterButtonClick(1, ingredientIndex)"
                 :disabled="ingredient.value >= 3"
               >
                 <span class="visually-hidden">Больше</span>
@@ -125,11 +119,19 @@ export default {
       const sauseName = this.currentIngredients.sauce.name;
       this.handelSauceUpdate({ key: sauseName, value: radioValue });
     },
-    onCounterButtonClick(evt, delta, ingridientIndex) {
+    onCounterButtonClick(delta, ingridientIndex) {
       this.handelSubIngridentUpdate({ ingridientIndex, delta });
     },
-    onDragStart(evt, ingridientIndex) {
+    onDragStart(ingridientIndex) {
       this.$emit("ingrideintDragged", ingridientIndex);
+    },
+    ingredientFillingClass(ingredientImage) {
+      const modificator = ingredientImage
+        .split("/")
+        .find((item) => item.endsWith(".svg") === true)
+        .slice(0, -4);
+
+      return `filling filling--${modificator}`;
     },
   },
 };

@@ -32,29 +32,17 @@ const calcPizzaPrice = (pizza, pizzaSchema) => {
 export default {
   namespaced: true,
   state: {
-    pizzaSchema: null,
-    miscSchema: [],
     ordersList: [],
   },
   actions: {
-    async getOrdersList({ commit, dispatch, rootState }) {
+    async fetchOrdersList({ commit }) {
       try {
-        if (
-          rootState.Builder.pizzaSchema === null ||
-          rootState.Cart.miscSchema.length === 0
-        ) {
-          await dispatch("Builder/fetchBuilder", null, { root: true });
-          await dispatch("Cart/fetchMisc", null, { root: true });
-        }
-
         const data = await this.$api.orders.get();
-        const pizzaSchema = rootState.Builder.pizzaSchema;
-        const miscSchema = rootState.Cart.miscSchema;
 
-        commit(SET_ORDERS_LIST, { data, pizzaSchema, miscSchema });
+        commit(SET_ORDERS_LIST, { data });
       } catch {
         console.log("Orders get error");
-        commit(SET_ORDERS_LIST, { data: [], pizzaSchema: {}, miscSchema: [] });
+        commit(SET_ORDERS_LIST, { data: [] });
       }
     },
     async postOrder({ dispatch, rootState }, orderData) {
@@ -64,7 +52,7 @@ export default {
           userId: rootState.Auth.user.id,
         };
         await this.$api.orders.post(postData);
-        await dispatch("getOrdersList");
+        await dispatch("fetchOrdersList");
       } catch {
         console.log("Order post error");
       }
@@ -72,19 +60,21 @@ export default {
     async deleteOrder({ dispatch }, orderId) {
       try {
         await this.$api.orders.delete(orderId);
-        await dispatch("getOrdersList");
+        await dispatch("fetchOrdersList");
       } catch {
         console.log("Order delete error");
       }
     },
-    repeatOrder({ state, getters, commit, rootState }, order) {
-      const { pizzaSchema, miscSchema } = state;
+    repeatOrder(
+      { getters, commit, rootState },
+      { order, pizzaSchema, miscSchema }
+    ) {
       const { getPizzaPrice } = getters;
       const { addressId, orderAddress, orderMisc, orderPizzas } = order;
 
       const pizzas = orderPizzas.map((pizza) => {
         return {
-          price: getPizzaPrice(pizza),
+          price: getPizzaPrice(pizza, pizzaSchema),
           counter: pizza.quantity,
           title: {
             name: "title",
@@ -160,24 +150,18 @@ export default {
   },
   mutations: {
     [SET_ORDERS_LIST](state, payload) {
-      const { data, pizzaSchema, miscSchema } = payload;
+      const { data } = payload;
 
-      state.pizzaSchema = { ...pizzaSchema };
-      state.miscSchema = [...miscSchema];
       state.ordersList = [...data];
     },
   },
   getters: {
-    getMisc: (state) => (miscData) => {
-      const { miscSchema } = state;
-
+    getMisc: () => (miscData, miscSchema) => {
       const misc = miscSchema.find((option) => option.id === miscData.miscId);
 
       return misc;
     },
-    getPizzaIngredients: (state) => (ingredients) => {
-      const { pizzaSchema } = state;
-
+    getPizzaIngredients: () => (ingredients, pizzaSchema) => {
       return ingredients
         .map((item) => {
           return pizzaSchema.ingredients
@@ -186,8 +170,7 @@ export default {
         })
         .join(" ,");
     },
-    getPizzaSize: (state) => (sizeId) => {
-      const { pizzaSchema } = state;
+    getPizzaSize: () => (sizeId, pizzaSchema) => {
       let pizzaSize = "";
 
       const schemaSize = pizzaSchema.sizes.find(
@@ -198,8 +181,7 @@ export default {
 
       return pizzaSize;
     },
-    getPizzaDough: (state) => (doughId) => {
-      const { pizzaSchema } = state;
+    getPizzaDough: () => (doughId, pizzaSchema) => {
       let pizzaDough = "";
 
       const schemaDough = pizzaSchema.dough.find(
@@ -221,8 +203,7 @@ export default {
 
       return pizzaDough;
     },
-    getPizzaSauce: (state) => (sauceId) => {
-      const { pizzaSchema } = state;
+    getPizzaSauce: () => (sauceId, pizzaSchema) => {
       let pizzaSauce = "";
 
       const schemaSauce = pizzaSchema.sauces.find(
@@ -233,13 +214,11 @@ export default {
 
       return pizzaSauce;
     },
-    getPizzaPrice: (state) => (pizza) => {
-      const { pizzaSchema } = state;
-
+    getPizzaPrice: () => (pizza, pizzaSchema) => {
       return calcPizzaPrice(pizza, pizzaSchema);
     },
-    getOrderPrice: (state) => (id) => {
-      const { ordersList, pizzaSchema, miscSchema } = state;
+    getOrderPrice: (state) => (id, pizzaSchema, miscSchema) => {
+      const { ordersList } = state;
 
       let orderPrice = 0;
       const order = ordersList.find((item) => item.id === id);

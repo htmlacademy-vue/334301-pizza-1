@@ -71,6 +71,7 @@
               name="street"
               :value="form.street"
               @input="onInputChange"
+              :disabled="form.activeDeliveryOption !== 'new'"
             />
           </label>
         </div>
@@ -83,6 +84,7 @@
               name="house"
               :value="form.house"
               @input="onInputChange"
+              :disabled="form.activeDeliveryOption !== 'new'"
             />
           </label>
         </div>
@@ -95,6 +97,7 @@
               name="apartment"
               :value="form.apartment"
               @input="onInputChange"
+              :disabled="form.activeDeliveryOption !== 'new'"
             />
           </label>
         </div>
@@ -112,6 +115,7 @@ export default {
   data() {
     return {
       activeDeliveryOption: "pickup",
+      addressListLoaded: false,
     };
   },
   computed: {
@@ -153,11 +157,23 @@ export default {
       const { name, value } = evt.target;
       this.handelCartFormUpdate({ key: name, value });
     },
+    prepareUserAddresses() {
+      if (this.isAuthenticated === true && this.addressListLoaded === false) {
+        this.addressListLoaded = true;
+        this.handelCartFormUpdate({
+          key: "tel",
+          value: this.user.phone,
+        });
+
+        this.handelAddressDownload();
+      }
+    },
   },
-  async mounted() {
-    if (this.isAuthenticated === true) {
-      await this.handelAddressDownload();
-    }
+  updated() {
+    this.prepareUserAddresses();
+  },
+  mounted() {
+    this.prepareUserAddresses();
   },
 };
 </script>

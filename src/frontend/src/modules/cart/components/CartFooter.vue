@@ -18,6 +18,7 @@
         class="button"
         @click.prevent="onSubmitButtonClick"
         :disabled="!canSubmit"
+        :class="{ 'button--disabled': !canSubmit }"
       >
         Оформить заказ
       </button>

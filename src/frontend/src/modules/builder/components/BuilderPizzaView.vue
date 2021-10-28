@@ -20,13 +20,9 @@
       <div class="pizza" :class="foundationModificator">
         <div class="pizza__wrapper">
           <div
-            class="pizza__filling"
             v-for="(ingredient, ingredientIndex) in filteredSubIngredients"
             :key="`pizza-filling-${ingredientIndex}`"
-            :class="`pizza__filling--${ingredient.image
-              .split('/')
-              .find((item) => item.endsWith('.svg') === true)
-              .slice(0, -4)}`"
+            :class="pizzaFillingClass(ingredient.image, ingredient.value)"
           ></div>
         </div>
       </div>
@@ -80,6 +76,27 @@ export default {
     },
     onDrop() {
       this.$emit("ingridientDropped");
+    },
+    pizzaFillingClass(ingredientImage, ingridientValue) {
+      const firstModificator = ingredientImage
+        .split("/")
+        .find((item) => item.endsWith(".svg") === true)
+        .slice(0, -4);
+
+      let secondModificator = "";
+      switch (ingridientValue) {
+        case 2:
+          secondModificator = " pizza__filling--second";
+          break;
+        case 3:
+          secondModificator = " pizza__filling--third";
+          break;
+        default:
+          secondModificator = "";
+          break;
+      }
+
+      return `pizza__filling pizza__filling--${firstModificator}${secondModificator}`;
     },
   },
 };

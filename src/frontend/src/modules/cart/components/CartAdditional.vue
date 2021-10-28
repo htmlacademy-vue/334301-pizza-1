@@ -21,7 +21,8 @@
             <button
               type="button"
               class="counter__button counter__button--minus"
-              @click="onCounterButtonClick($event, -1, miscIndex)"
+              :class="{ 'counter__button--disabled': miscItem.counter <= 0 }"
+              @click="onCounterButtonClick(-1, miscIndex)"
               :disabled="miscItem.counter <= 0"
             >
               <span class="visually-hidden">Меньше</span>
@@ -37,7 +38,7 @@
               class="
                 counter__button counter__button--plus counter__button--orange
               "
-              @click="onCounterButtonClick($event, 1, miscIndex)"
+              @click="onCounterButtonClick(1, miscIndex)"
             >
               <span class="visually-hidden">Больше</span>
             </button>
@@ -65,7 +66,7 @@ export default {
     ...mapMutations("Cart", {
       handelMiscCounterUpdate: UPDATE_CART_MISC_COUNTER,
     }),
-    onCounterButtonClick(evt, delta, index) {
+    onCounterButtonClick(delta, index) {
       this.handelMiscCounterUpdate({ miscIndex: index, delta });
     },
   },

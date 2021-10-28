@@ -6,12 +6,12 @@
       <RadioButton
         v-for="(size, sizeIndex) in preparedSizes"
         :key="`size-${sizeIndex}`"
-        :className="`diameter__input diameter__input--${size.value}`"
+        :class="`diameter__input diameter__input--${size.value}`"
         name="diameter"
         :value="size.value"
         :checked="size.value === currentSize.value"
         :spanText="size.name"
-        @radioClick="onRadioButtonClick($event, size.value)"
+        @radioClick="onRadioButtonClick(size.value)"
       />
     </div>
   </div>
@@ -52,7 +52,7 @@ export default {
     ...mapMutations("Builder", {
       handelPizzaUpdate: UPDATE_PIZZA,
     }),
-    onRadioButtonClick(evt, radioValue) {
+    onRadioButtonClick(radioValue) {
       this.handelPizzaUpdate({ key: this.currentSize.name, value: radioValue });
     },
   },

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="pizzaSchema !== null && miscSchema.length !== 0">
     <section
       class="sheet order"
       v-for="orderInfo in ordersList"
@@ -11,14 +11,20 @@
         </div>
 
         <div class="order__sum">
-          <span>{{ `Сумма заказа: ${getOrderPrice(orderInfo.id)} ₽` }}</span>
+          <span>{{
+            `Сумма заказа: ${getOrderPrice(
+              orderInfo.id,
+              pizzaSchema,
+              miscSchema
+            )} ₽`
+          }}</span>
         </div>
 
         <div class="order__button">
           <button
             type="button"
             class="button button--border"
-            @click="onDeleteButtonClick($event, orderInfo.id)"
+            @click="onDeleteButtonClick(orderInfo.id)"
           >
             Удалить
           </button>
@@ -27,7 +33,7 @@
           <button
             type="button"
             class="button"
-            @click="onRepeatButtonClick($event, orderInfo)"
+            @click="onRepeatButtonClick(orderInfo)"
           >
             Повторить
           </button>
@@ -53,15 +59,23 @@
               <ul>
                 <li>
                   {{
-                    `${getPizzaSize(orderPizza.sizeId)}, ${getPizzaDough(
-                      orderPizza.doughId
-                    )}`
+                    `${getPizzaSize(
+                      orderPizza.sizeId,
+                      pizzaSchema
+                    )}, ${getPizzaDough(orderPizza.doughId, pizzaSchema)}`
                   }}
                 </li>
-                <li>{{ `Соус: ${getPizzaSauce(orderPizza.sauceId)}` }}</li>
                 <li>
                   {{
-                    `Начинка: ${getPizzaIngredients(orderPizza.ingredients)}`
+                    `Соус: ${getPizzaSauce(orderPizza.sauceId, pizzaSchema)}`
+                  }}
+                </li>
+                <li>
+                  {{
+                    `Начинка: ${getPizzaIngredients(
+                      orderPizza.ingredients,
+                      pizzaSchema
+                    )}`
                   }}
                 </li>
               </ul>
@@ -72,7 +86,7 @@
             {{
               `${
                 orderPizza.quantity > 1 ? `${orderPizza.quantity}x` : ""
-              }${getPizzaPrice(orderPizza)} ₽`
+              }${getPizzaPrice(orderPizza, pizzaSchema)} ₽`
             }}
           </p>
         </li>
@@ -84,16 +98,16 @@
           :key="`order-misc-${orderMisc.id}`"
         >
           <img
-            :src="getMisc(orderMisc).image"
+            :src="getMisc(orderMisc, miscSchema).image"
             width="20"
             height="30"
-            :alt="getMisc(orderMisc).name"
+            :alt="getMisc(orderMisc, miscSchema).name"
           />
           <p>
-            <span>{{ getMisc(orderMisc).name }}</span>
+            <span>{{ getMisc(orderMisc, miscSchema).name }}</span>
             <b>{{
               `${orderMisc.quantity > 1 ? `${orderMisc.quantity}x` : ""}${
-                getMisc(orderMisc).price
+                getMisc(orderMisc, miscSchema).price
               } ₽`
             }}</b>
           </p>
@@ -121,6 +135,8 @@ import { mapState, mapGetters, mapActions } from "vuex";
 export default {
   name: "OrdersSheet",
   computed: {
+    ...mapState("Builder", ["pizzaSchema"]),
+    ...mapState("Cart", ["miscSchema"]),
     ...mapState("Orders", ["ordersList"]),
     ...mapGetters("Orders", [
       "getOrderPrice",
@@ -134,15 +150,19 @@ export default {
   },
   methods: {
     ...mapActions("Orders", {
-      handelOrdersDownload: "getOrdersList",
+      handelOrdersDownload: "fetchOrdersList",
       handelOrderDelete: "deleteOrder",
       handelOrderRepeat: "repeatOrder",
     }),
-    onDeleteButtonClick(evt, orderId) {
+    onDeleteButtonClick(orderId) {
       this.handelOrderDelete(orderId);
     },
-    onRepeatButtonClick(evt, order) {
-      this.handelOrderRepeat(order);
+    onRepeatButtonClick(order) {
+      this.handelOrderRepeat({
+        order,
+        pizzaSchema: this.pizzaSchema,
+        miscSchema: this.miscSchema,
+      });
       this.$router.push({ path: "/cart" });
     },
   },

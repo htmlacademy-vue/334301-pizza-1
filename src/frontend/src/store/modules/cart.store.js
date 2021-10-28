@@ -10,7 +10,6 @@ import {
 
 const initialState = () => ({
   pizzas: [],
-  pizzaSchema: null,
   miscSchema: [],
   misc: [],
   form: {
@@ -27,19 +26,8 @@ export default {
   namespaced: true,
   state: initialState(),
   actions: {
-    async fetchMisc({ commit, dispatch, rootState }) {
+    async fetchMisc({ commit }) {
       const miscSchema = await this.$api.misc.query();
-      const pizzaSchema = rootState.Builder.pizzaSchema;
-
-      if (rootState.Auth.isAuthenticated === true) {
-        await dispatch("Address/getAddressList", null, { root: true });
-
-        commit(UPDATE_CART_FORM, {
-          key: "tel",
-          value: rootState.Auth.user.phone,
-          data,
-        });
-      }
 
       const data = miscSchema.map((item) => {
         return {
@@ -49,7 +37,6 @@ export default {
       });
       commit(SET_CART_MISC, {
         miscSchema,
-        pizzaSchema,
         data,
       });
     },
@@ -100,11 +87,7 @@ export default {
         pizzas: preparedPizzas,
         misc: preparedMisc,
         phone: form.tel,
-        address: {
-          street: form.street,
-          building: form.house,
-          flat: form.apartment,
-        },
+        address: {},
       };
 
       if (rootState.Auth.isAuthenticated === false) {
@@ -117,10 +100,22 @@ export default {
           await this.$api.orders.post(postData);
           break;
 
+        case "new":
+          postData.address = {
+            street: form.street,
+            building: form.house,
+            flat: form.apartment,
+          };
+          break;
+
         default:
-          await this.$api.orders.post(postData);
+          postData.address = {
+            id: form.activeDeliveryOption,
+          };
           break;
       }
+
+      await this.$api.orders.post(postData);
 
       commit(UPDATE_CART_POPUP_STATE, true);
     },
@@ -155,10 +150,9 @@ export default {
       }
     },
     [SET_CART_MISC](state, payload) {
-      const { miscSchema, pizzaSchema, data } = payload;
+      const { miscSchema, data } = payload;
 
       state.miscSchema = [...miscSchema];
-      state.pizzaSchema = { ...pizzaSchema };
       state.misc = [...data];
     },
     [UPDATE_CART_MISC_COUNTER](state, payload) {
@@ -178,8 +172,8 @@ export default {
     },
   },
   getters: {
-    getPizzaSize: (state) => (id) => {
-      const { pizzas, pizzaSchema } = state;
+    getPizzaSize: (state) => (id, pizzaSchema) => {
+      const { pizzas } = state;
       const pizza = pizzas[id];
       let pizzaSize = "";
 
@@ -191,8 +185,8 @@ export default {
 
       return pizzaSize;
     },
-    getPizzaDough: (state) => (id) => {
-      const { pizzas, pizzaSchema } = state;
+    getPizzaDough: (state) => (id, pizzaSchema) => {
+      const { pizzas } = state;
       const pizza = pizzas[id];
       let pizzaDough = "";
 
@@ -215,8 +209,8 @@ export default {
 
       return pizzaDough;
     },
-    getPizzaSauce: (state) => (id) => {
-      const { pizzas, pizzaSchema } = state;
+    getPizzaSauce: (state) => (id, pizzaSchema) => {
+      const { pizzas } = state;
       const pizza = pizzas[id];
       let pizzaSauce = "";
 

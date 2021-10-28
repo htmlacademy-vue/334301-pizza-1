@@ -3,7 +3,7 @@
     <p>{{ `Итого: ${calculatedPrice} ₽` }}</p>
     <button
       type="button"
-      class="button button--disabled"
+      class="button"
       :class="{ 'button--disabled': canOrderPizza === false }"
       :disabled="canOrderPizza === false"
       @click="onSubmitButtonClick"

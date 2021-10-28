@@ -25,7 +25,9 @@
         </picture>
         <span>{{ user.name }}</span>
       </router-link>
-      <a href="#" class="header__logout"><span>Выйти</span></a>
+      <a href="#" class="header__logout" @click.prevent="onLogoutClick">
+        <span>Выйти</span>
+      </a>
     </div>
   </header>
 </template>

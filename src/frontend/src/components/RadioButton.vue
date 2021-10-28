@@ -1,5 +1,5 @@
 <template>
-  <label :class="className" @click="onRaidoButtonClick">
+  <label @click="onRaidoButtonClick">
     <input
       type="radio"
       :name="name"
@@ -16,10 +16,6 @@
 export default {
   name: "RadioButton",
   props: {
-    className: {
-      type: String,
-      required: true,
-    },
     name: {
       type: String,
       required: true,
