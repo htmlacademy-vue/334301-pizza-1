@@ -97,7 +97,6 @@ export default {
       switch (form.activeDeliveryOption) {
         case "pickup":
           postData.address = null;
-          await this.$api.orders.post(postData);
           break;
 
         case "new":

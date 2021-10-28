@@ -34,7 +34,7 @@
               :draggable="ingredient.value < 3"
               @dragstart="onDragStart(ingredientIndex)"
             >
-              {{ ingredient.text }}
+              {{ ingredient.name }}
             </span>
 
             <div class="counter counter--orange ingredients__counter">

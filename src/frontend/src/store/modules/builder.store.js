@@ -16,10 +16,13 @@ export default {
   },
   actions: {
     async fetchBuilder({ commit }) {
-      const dough = await this.$api.dough.query();
-      const ingredients = await this.$api.ingredients.query();
-      const sauces = await this.$api.sauces.query();
-      const sizes = await this.$api.sizes.query();
+      const results = await Promise.all([
+        this.$api.dough.query(),
+        this.$api.ingredients.query(),
+        this.$api.sauces.query(),
+        this.$api.sizes.query(),
+      ]);
+      const [dough, ingredients, sauces, sizes] = results;
 
       const newSchema = {
         dough,
