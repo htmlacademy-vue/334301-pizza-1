@@ -30,7 +30,14 @@
       </div>
     </form>
 
-    <router-view />
+    <transition
+      name="view"
+      appear
+      enter-active-class="animate__animated animate__fadeIn"
+      leave-active-class="animate__animated animate__fadeOut"
+    >
+      <router-view />
+    </transition>
   </main>
 </template>
 

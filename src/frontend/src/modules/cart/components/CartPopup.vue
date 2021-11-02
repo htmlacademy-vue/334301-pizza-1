@@ -1,18 +1,24 @@
 <template>
-  <div class="popup" v-if="popupActive === true">
-    <a href="#" class="close" @click.prevent="onPopupButtonClick">
-      <span class="visually-hidden">Закрыть попап</span>
-    </a>
-    <div class="popup__title">
-      <h2 class="title">Спасибо за заказ</h2>
+  <transition
+    name="cart-popup"
+    enter-active-class="animate__animated animate__fadeIn"
+    leave-active-class="animate__animated animate__fadeOut"
+  >
+    <div class="popup" v-if="popupActive === true">
+      <a href="#" class="close" @click.prevent="onPopupButtonClick">
+        <span class="visually-hidden">Закрыть попап</span>
+      </a>
+      <div class="popup__title">
+        <h2 class="title">Спасибо за заказ</h2>
+      </div>
+      <p>Мы начали готовить Ваш заказ, скоро привезём его вам ;)</p>
+      <div class="popup__button">
+        <a href="#" class="button" @click.prevent="onPopupButtonClick"
+          >Отлично, я жду!</a
+        >
+      </div>
     </div>
-    <p>Мы начали готовить Ваш заказ, скоро привезём его вам ;)</p>
-    <div class="popup__button">
-      <a href="#" class="button" @click.prevent="onPopupButtonClick"
-        >Отлично, я жду!</a
-      >
-    </div>
-  </div>
+  </transition>
 </template>
 
 <script>
@@ -33,14 +39,16 @@ export default {
       handelCartReset: RESET_CART,
     }),
     onPopupButtonClick() {
-      if (this.isAuthenticated === true) {
-        this.$router.push({ path: "/orders" });
-      } else {
-        this.$router.push({ path: "/" });
-      }
-
-      this.handelBuilderReset();
       this.handelCartReset();
+      this.handelBuilderReset();
+
+      setTimeout(() => {
+        if (this.isAuthenticated === true) {
+          this.$router.push({ path: "/orders" });
+        } else {
+          this.$router.push({ path: "/" });
+        }
+      }, 300);
     },
   },
 };

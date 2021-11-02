@@ -18,13 +18,18 @@
       @dragenter.prevent
     >
       <div class="pizza" :class="foundationModificator">
-        <div class="pizza__wrapper">
+        <transition-group
+          class="pizza__wrapper"
+          name="ingredient"
+          tag="div"
+          enter-active-class="animate__animated animate__bounceInDown"
+        >
           <div
             v-for="(ingredient, ingredientIndex) in filteredSubIngredients"
             :key="`pizza-filling-${ingredientIndex}`"
             :class="pizzaFillingClass(ingredient.image, ingredient.value)"
           ></div>
-        </div>
+        </transition-group>
       </div>
     </div>
   </div>
