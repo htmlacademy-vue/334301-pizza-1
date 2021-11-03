@@ -1,6 +1,6 @@
 <template>
   <div>
-    <AppLayoutHeader />
+    <AppLayoutHeader v-slot:header />
 
     <slot />
   </div>

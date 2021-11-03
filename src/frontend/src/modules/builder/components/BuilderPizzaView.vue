@@ -19,11 +19,13 @@
     >
       <div class="pizza" :class="foundationModificator">
         <div class="pizza__wrapper">
-          <div
-            v-for="(ingredient, ingredientIndex) in filteredSubIngredients"
+          <BuilderIngredient
+            v-for="(ingredient, ingredientIndex) in this.currentPizza
+              .ingredients.subIngredients"
             :key="`pizza-filling-${ingredientIndex}`"
             :class="pizzaFillingClass(ingredient.image, ingredient.value)"
-          ></div>
+            :value="ingredient.value"
+          />
         </div>
       </div>
     </div>
@@ -33,9 +35,13 @@
 <script>
 import { mapState, mapMutations } from "vuex";
 import { UPDATE_PIZZA } from "@/store/mutation-types.js";
+import BuilderIngredient from "@/modules/builder/components/BuilderIngredient.vue";
 
 export default {
   name: "BuilderPizzaView",
+  components: {
+    BuilderIngredient,
+  },
   props: {
     currentPizza: {
       type: Object,
@@ -55,13 +61,6 @@ export default {
       const sauceModificator = sauceName === "Томатный" ? "tomato" : "creamy";
 
       return `pizza--foundation--${doughModificator}-${sauceModificator}`;
-    },
-    filteredSubIngredients() {
-      return this.currentPizza.ingredients.subIngredients.filter(
-        (ingridient) => {
-          return ingridient.value > 0;
-        }
-      );
     },
   },
   methods: {
