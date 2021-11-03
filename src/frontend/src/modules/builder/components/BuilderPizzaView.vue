@@ -18,18 +18,15 @@
       @dragenter.prevent
     >
       <div class="pizza" :class="foundationModificator">
-        <transition-group
-          class="pizza__wrapper"
-          name="ingredient"
-          tag="div"
-          enter-active-class="animate__animated animate__bounceInDown"
-        >
-          <div
-            v-for="(ingredient, ingredientIndex) in filteredSubIngredients"
+        <div class="pizza__wrapper">
+          <BuilderIngredient
+            v-for="(ingredient, ingredientIndex) in this.currentPizza
+              .ingredients.subIngredients"
             :key="`pizza-filling-${ingredientIndex}`"
             :class="pizzaFillingClass(ingredient.image, ingredient.value)"
-          ></div>
-        </transition-group>
+            :value="ingredient.value"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -38,9 +35,13 @@
 <script>
 import { mapState, mapMutations } from "vuex";
 import { UPDATE_PIZZA } from "@/store/mutation-types.js";
+import BuilderIngredient from "@/modules/builder/components/BuilderIngredient.vue";
 
 export default {
   name: "BuilderPizzaView",
+  components: {
+    BuilderIngredient,
+  },
   props: {
     currentPizza: {
       type: Object,
@@ -60,13 +61,6 @@ export default {
       const sauceModificator = sauceName === "Томатный" ? "tomato" : "creamy";
 
       return `pizza--foundation--${doughModificator}-${sauceModificator}`;
-    },
-    filteredSubIngredients() {
-      return this.currentPizza.ingredients.subIngredients.filter(
-        (ingridient) => {
-          return ingridient.value > 0;
-        }
-      );
     },
   },
   methods: {
