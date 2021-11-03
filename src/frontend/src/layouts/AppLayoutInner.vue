@@ -1,17 +1,11 @@
 <template>
   <div>
-    <AppLayoutHeader />
+    <AppLayoutHeader v-slot:header />
 
     <main class="layout">
       <AppLayoutInnerSidebar />
 
-      <transition
-        name="view"
-        appear
-        enter-active-class="animate__animated animate__slideInLeft"
-      >
-        <slot />
-      </transition>
+      <slot />
     </main>
   </div>
 </template>

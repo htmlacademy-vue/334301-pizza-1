@@ -1,39 +1,56 @@
 <template>
-  <div class="sign-form">
-    <router-link to="/" class="close close--white">
-      <span class="visually-hidden">Закрыть форму авторизации</span>
-    </router-link>
-    <div class="sign-form__title">
-      <h1 class="title title--small">Авторизуйтесь на сайте</h1>
-    </div>
-    <form action="test.html" method="post">
-      <div class="sign-form__input">
-        <label class="input">
-          <span>E-mail</span>
-          <input
-            type="email"
-            name="email"
-            placeholder="example@mail.ru"
-            v-model="email"
-          />
-        </label>
+  <div style="width: 100%; height: 100vh">
+    <div class="sign-form">
+      <router-link to="/" class="close close--white">
+        <span class="visually-hidden">Закрыть форму авторизации</span>
+      </router-link>
+      <div class="sign-form__title">
+        <h1 class="title title--small">Авторизуйтесь на сайте</h1>
       </div>
+      <form action="test.html" method="post">
+        <div class="sign-form__input">
+          <label class="input">
+            <span>E-mail</span>
+            <input
+              type="email"
+              name="email"
+              placeholder="example@mail.ru"
+              v-model="email"
+              @input="
+                () => {
+                  this.errorText = '';
+                }
+              "
+            />
+          </label>
+        </div>
 
-      <div class="sign-form__input">
-        <label class="input">
-          <span>Пароль</span>
-          <input
-            type="password"
-            name="pass"
-            placeholder="***********"
-            v-model="password"
-          />
-        </label>
-      </div>
-      <button type="submit" class="button" @click.prevent="onSubmitButtonClick">
-        Авторизоваться
-      </button>
-    </form>
+        <div class="sign-form__input">
+          <label class="input">
+            <span>Пароль</span>
+            <input
+              type="password"
+              name="pass"
+              placeholder="***********"
+              v-model="password"
+              @input="
+                () => {
+                  this.errorText = '';
+                }
+              "
+            />
+          </label>
+        </div>
+        <button
+          type="submit"
+          class="button"
+          @click.prevent="onSubmitButtonClick"
+        >
+          Авторизоваться
+        </button>
+        <p v-if="errorText.length > 0">{{ errorText }}</p>
+      </form>
+    </div>
   </div>
 </template>
 
@@ -48,6 +65,7 @@ export default {
     return {
       email: "",
       password: "",
+      errorText: "",
     };
   },
   methods: {
@@ -59,10 +77,13 @@ export default {
 
       if (EMAIL_PATTERN.test(this.email) === false) {
         canSubmit = false;
+        this.errorText = "Введите корректный email";
       }
 
       if (this.password.split(" ").join("").length === 0) {
         canSubmit = false;
+        this.errorText +=
+          this.errorText !== "" ? ". Введите пароль" : "Введите пароль";
       }
 
       if (canSubmit === true) {

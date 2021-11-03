@@ -14,7 +14,7 @@
       <router-link to="/cart">{{ totalPrice }} ₽</router-link>
     </div>
     <div class="header__user" v-if="isAuthenticated === false">
-      <router-link to="/login" class="header__login">
+      <router-link :to="loginRoute" class="header__login">
         <span>Войти</span>
       </router-link>
     </div>
@@ -40,6 +40,13 @@ export default {
   computed: {
     ...mapState("Auth", ["isAuthenticated", "user"]),
     ...mapGetters("Cart", ["totalPrice"]),
+    loginRoute() {
+      if (this.$route.path !== "/login" && this.$route.path !== "/") {
+        return "/sign-in";
+      }
+
+      return "/login";
+    },
   },
   methods: {
     ...mapActions("Auth", {
