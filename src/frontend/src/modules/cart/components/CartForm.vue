@@ -177,3 +177,10 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+@import "~@/assets/scss/mixins/mixins";
+
+@import "~@/assets/scss/blocks/cart";
+@import "~@/assets/scss/blocks/cart-form";
+</style>

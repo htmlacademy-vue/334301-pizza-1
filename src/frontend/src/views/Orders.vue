@@ -18,3 +18,11 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+@import "~@/assets/scss/mixins/mixins";
+
+@import "~@/assets/scss/layout/layout";
+
+@import "~@/assets/scss/blocks/title";
+</style>

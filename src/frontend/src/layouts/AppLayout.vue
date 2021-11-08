@@ -35,6 +35,15 @@ export default {
       return animation;
     },
   },
+  watch: {
+    "$route.path": {
+      handler: function (search) {
+        console.log(search);
+      },
+      deep: true,
+      immediate: true,
+    },
+  },
   mounted() {
     this.previousPath = this.$route.path;
   },

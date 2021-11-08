@@ -1,5 +1,5 @@
 <template>
-  <label @click="onRaidoButtonClick">
+  <label @click="onRadioButtonClick">
     <input
       type="radio"
       :name="name"
@@ -40,9 +40,16 @@ export default {
     },
   },
   methods: {
-    onRaidoButtonClick() {
+    onRadioButtonClick() {
       this.$emit("radioClick", this.value);
     },
   },
 };
 </script>
+
+<style lang="scss" scoped>
+@import "~@/assets/scss/mixins/mixins";
+
+@import "~@/assets/scss/blocks/dough";
+@import "~@/assets/scss/blocks/filling";
+</style>

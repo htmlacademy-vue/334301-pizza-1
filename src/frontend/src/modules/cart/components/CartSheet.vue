@@ -103,3 +103,13 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+@import "~@/assets/scss/mixins/mixins";
+
+@import "~@/assets/scss/layout/sheet";
+
+@import "~@/assets/scss/blocks/cart-list";
+@import "~@/assets/scss/blocks/cart";
+@import "~@/assets/scss/blocks/counter";
+</style>

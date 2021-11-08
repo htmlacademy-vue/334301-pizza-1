@@ -98,3 +98,11 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+@import "~@/assets/scss/mixins/mixins";
+
+@import "~@/assets/scss/visually-hidden";
+
+@import "~@/assets/scss/layout/sign-form";
+</style>

@@ -153,3 +153,12 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+@import "~@/assets/scss/mixins/mixins";
+
+@import "~@/assets/scss/layout/sheet";
+
+@import "~@/assets/scss/blocks/order";
+@import "~@/assets/scss/blocks/product";
+</style>

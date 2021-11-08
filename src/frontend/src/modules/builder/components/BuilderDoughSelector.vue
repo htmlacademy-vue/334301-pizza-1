@@ -70,7 +70,6 @@ export default {
 <style lang="scss" scoped>
 @import "~@/assets/scss/mixins/mixins";
 
-@import "~@/assets/scss/layout/content";
 @import "~@/assets/scss/layout/sheet";
 
 @import "~@/assets/scss/blocks/title";

@@ -38,3 +38,14 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+@import "~@/assets/scss/mixins/mixins";
+
+@import "~@/assets/scss/layout/layout-form";
+@import "~@/assets/scss/layout/container";
+@import "~@/assets/scss/layout/content";
+
+@import "~@/assets/scss/blocks/title";
+@import "~@/assets/scss/blocks/cart";
+</style>
