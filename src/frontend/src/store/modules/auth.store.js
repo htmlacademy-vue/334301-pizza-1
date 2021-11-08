@@ -1,16 +1,25 @@
-import { UPDATE_AUTH_STATE, UPDATE_USER_DATA } from "@/store/mutation-types";
+import {
+  UPDATE_AUTH_STATE,
+  UPDATE_USER_DATA,
+  UPDATE_AUTH_ERROR,
+} from "@/store/mutation-types";
 
 export default {
   namespaced: true,
   state: {
     isAuthenticated: false,
     user: null,
+    authErrorMessage: "",
   },
   actions: {
-    async login({ dispatch }, credentials) {
-      const data = await this.$api.auth.login(credentials);
-      this.$jwt.saveToken(data.token);
-      dispatch("getMe");
+    async login({ commit, dispatch }, credentials) {
+      try {
+        const data = await this.$api.auth.login(credentials);
+        this.$jwt.saveToken(data.token);
+        dispatch("getMe");
+      } catch (e) {
+        commit(UPDATE_AUTH_ERROR, e.response.data.error.message);
+      }
     },
     async logout({ commit }, sendRequest = true) {
       if (sendRequest === true) {
@@ -42,6 +51,9 @@ export default {
     },
     [UPDATE_USER_DATA](state, payload) {
       state.user = { ...payload.user };
+    },
+    [UPDATE_AUTH_ERROR](state, payload) {
+      state.authErrorMessage = payload;
     },
   },
 };

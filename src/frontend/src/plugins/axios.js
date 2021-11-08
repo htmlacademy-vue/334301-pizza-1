@@ -4,15 +4,11 @@ const axiosInstance = axios.create({
   baseURL: "/api/",
 });
 
-axiosInstance.interceptors.response.use(
-  (res) => res,
-  (e) => {
-    const defaultMessage = "Возникла ошибка при выполнении запроса к серверу";
-    axiosInstance.$notifier.error(
-      e?.response?.data?.error?.message || defaultMessage
-    );
-    return Promise.reject(e);
-  }
-);
+const onSuccess = (response) => response;
+const onFail = (err) => {
+  throw err;
+};
+
+axiosInstance.interceptors.response.use(onSuccess, onFail);
 
 export default axiosInstance;

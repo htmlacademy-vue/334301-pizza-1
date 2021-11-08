@@ -37,8 +37,11 @@ export default {
   },
   watch: {
     "$route.path": {
-      handler: function (search) {
-        console.log(search);
+      handler: function (path) {
+        this.previousPath =
+          this.previousPath === "/login" && path === "/"
+            ? this.previousPath
+            : path;
       },
       deep: true,
       immediate: true,
@@ -46,12 +49,6 @@ export default {
   },
   mounted() {
     this.previousPath = this.$route.path;
-  },
-  updated() {
-    this.previousPath =
-      this.previousPath === "/login" && this.$route.path === "/"
-        ? this.previousPath
-        : this.$route.path;
   },
 };
 </script>

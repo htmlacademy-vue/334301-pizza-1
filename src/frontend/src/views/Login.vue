@@ -19,6 +19,9 @@
               @input="
                 () => {
                   this.errorText = '';
+                  if (this.authErrorMessage.length > 0) {
+                    handelAuthErrorUpdate('');
+                  }
                 }
               "
             />
@@ -36,6 +39,9 @@
               @input="
                 () => {
                   this.errorText = '';
+                  if (this.authErrorMessage.length > 0) {
+                    handelAuthErrorUpdate('');
+                  }
                 }
               "
             />
@@ -48,6 +54,7 @@
         >
           Авторизоваться
         </button>
+        <p v-if="authErrorMessage.length > 0">{{ authErrorMessage }}</p>
         <p v-if="errorText.length > 0">{{ errorText }}</p>
       </form>
     </div>
@@ -55,7 +62,9 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapState, mapMutations, mapActions } from "vuex";
+
+import { UPDATE_AUTH_ERROR } from "@/store/mutation-types.js";
 
 const EMAIL_PATTERN = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/;
 
@@ -68,7 +77,20 @@ export default {
       errorText: "",
     };
   },
+  computed: {
+    ...mapState("Auth", ["authErrorMessage", "isAuthenticated"]),
+  },
+  watch: {
+    isAuthenticated: function (val) {
+      if (val === true) {
+        this.$router.push("/");
+      }
+    },
+  },
   methods: {
+    ...mapMutations("Auth", {
+      handelAuthErrorUpdate: UPDATE_AUTH_ERROR,
+    }),
     ...mapActions("Auth", {
       handelLogin: "login",
     }),
@@ -91,8 +113,6 @@ export default {
           email: this.email,
           password: this.password,
         });
-
-        this.$router.push("/");
       }
     },
   },
