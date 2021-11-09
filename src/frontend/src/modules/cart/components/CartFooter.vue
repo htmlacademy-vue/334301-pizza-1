@@ -1,7 +1,10 @@
 <template>
   <section class="footer">
     <div class="footer__more">
-      <router-link to="/" class="button button--border button--arrow">
+      <router-link
+        :to="AppRoute.MAIN"
+        class="button button--border button--arrow"
+      >
         Хочу еще одну
       </router-link>
     </div>
@@ -9,68 +12,103 @@
       Перейти к конструктору<br />чтоб собрать ещё одну пиццу
     </p>
     <div class="footer__price">
-      <b>Итого: {{ totalPrice }} ₽</b>
+      <b>Итого: {{ cartPrice }} ₽</b>
     </div>
 
     <div class="footer__submit">
-      <button
-        type="submit"
-        class="button"
-        @click.prevent="onSubmitButtonClick"
-        :disabled="!canSubmit"
-        :class="{ 'button--disabled': !canSubmit }"
-      >
+      <button type="submit" class="button" @click.prevent="handleSubmit">
         Оформить заказ
       </button>
     </div>
+
+    <transition name="modal">
+      <Popup v-if="isShowPopup" @close="handleClose" />
+    </transition>
   </section>
 </template>
-
 <script>
-import { mapState, mapGetters, mapActions } from "vuex";
+import { mapGetters, mapActions } from "vuex";
+import Popup from "../../../common/components/AppPopup";
+import { prepareOrder } from "../helpers/prepare-order";
+import resources from "../../../common/enums/resources";
+import validator from "../../../common/mixins/validator";
+import { AddressValidations } from "../../../common/const/validation";
+import { getValidationErrorMessage } from "../../../common/utils/helpers/validation";
+import { AppRoute } from "../../../common/const/route";
 
 export default {
   name: "CartFooter",
+  data() {
+    return {
+      AppRoute,
+      isShowPopup: false,
+    };
+  },
+  mixins: [validator],
+  components: { Popup },
   computed: {
-    ...mapState("Cart", ["pizzas", "form"]),
-    ...mapGetters("Cart", ["totalPrice"]),
-    canSubmit() {
-      let canSubmit = true;
-      if (this.pizzas.length === 0) {
+    ...mapGetters({
+      cartPrice: "cart/price",
+      user: "auth/getUser",
+    }),
+  },
+  methods: {
+    ...mapActions({
+      clearCart: "cart/clearCart",
+      clearAddress: "orders/clearAddress",
+    }),
+    validateAddress(address) {
+      if (!address) {
+        return true;
+      }
+      const validations = { ...AddressValidations };
+      delete validations.name;
+      if (
+        !this.$validateFields(
+          { street: address.street, building: address.building },
+          validations
+        )
+      ) {
+        const errorMessage = getValidationErrorMessage(validations, "АДРЕС");
+        this.$notifier.error(errorMessage);
         return false;
       }
 
-      this.pizzas.forEach((pizza) => {
-        if (pizza.counter === 0) {
-          canSubmit = false;
-        }
-      });
-
-      if (
-        this.form.activeDeliveryOption === "pickup" &&
-        this.form.tel.split(" ").join("").length === 0
-      ) {
-        canSubmit = false;
-      }
-
-      if (
-        this.form.activeDeliveryOption !== "pickup" &&
-        (this.form.tel.split(" ").join("").length === 0 ||
-          this.form.street.split(" ").join("").length === 0 ||
-          this.form.house.split(" ").join("").length === 0)
-      ) {
-        canSubmit = false;
-      }
-
-      return canSubmit;
+      return true;
     },
-  },
-  methods: {
-    ...mapActions("Cart", {
-      handelFormSubmit: "submitForm",
-    }),
-    onSubmitButtonClick() {
-      this.handelFormSubmit();
+
+    async handleSubmit() {
+      const storedAddress = this.$store.state.orders.address;
+      if (!this.validateAddress(storedAddress)) {
+        return;
+      }
+
+      const address = storedAddress ? { address: storedAddress } : {};
+      const order = {
+        ...prepareOrder(this.$store),
+        ...address,
+      };
+
+      try {
+        await this.$api[resources.ORDERS].post(order);
+      } catch (e) {
+        console.log(e);
+      }
+
+      this.isShowPopup = true;
+    },
+
+    async handleClose() {
+      this.isShowPopup = false;
+      const route = this.user ? AppRoute.ORDERS : AppRoute.MAIN;
+
+      setTimeout(async () => {
+        await Promise.all([
+          this.$router.push(route),
+          this.clearCart(),
+          this.clearAddress(),
+        ]);
+      }, 100);
     },
   },
 };

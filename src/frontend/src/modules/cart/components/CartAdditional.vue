@@ -2,73 +2,56 @@
   <div class="cart__additional">
     <ul class="additional-list">
       <li
+        v-for="product in additional"
+        :key="product.id"
         class="additional-list__item sheet"
-        v-for="(miscItem, miscIndex) in misc"
-        :key="`misc-${miscIndex}`"
       >
         <p class="additional-list__description">
           <img
-            :src="miscItem.image"
+            :src="product.image"
             width="39"
             height="60"
-            :alt="miscItem.name"
+            :alt="product.name"
           />
-          <span>{{ miscItem.name }}</span>
+          <span>{{ product.name }}</span>
         </p>
 
         <div class="additional-list__wrapper">
-          <div class="counter additional-list__counter">
-            <button
-              type="button"
-              class="counter__button counter__button--minus"
-              :class="{ 'counter__button--disabled': miscItem.counter <= 0 }"
-              @click="onCounterButtonClick(-1, miscIndex)"
-              :disabled="miscItem.counter <= 0"
-            >
-              <span class="visually-hidden">Меньше</span>
-            </button>
-            <input
-              type="text"
-              name="counter"
-              class="counter__input"
-              :value="miscItem.counter"
-            />
-            <button
-              type="button"
-              class="
-                counter__button counter__button--plus counter__button--orange
-              "
-              @click="onCounterButtonClick(1, miscIndex)"
-            >
-              <span class="visually-hidden">Больше</span>
-            </button>
-          </div>
+          <CartButtonCounter
+            class="additional-list__counter"
+            :id="product.id"
+            :count="product.count"
+            @increment="increment"
+            @decrement="decrement"
+            @change="changeCount"
+          />
 
           <div class="additional-list__price">
-            <b>{{ miscItem.price }} ₽</b>
+            <b>{{ product.price * product.count }} ₽</b>
           </div>
         </div>
       </li>
     </ul>
   </div>
 </template>
-
 <script>
-import { mapState, mapMutations } from "vuex";
-import { UPDATE_CART_MISC_COUNTER } from "@/store/mutation-types.js";
+import { mapGetters, mapActions } from "vuex";
+import CartButtonCounter from "./CartButtonCounter";
 
 export default {
   name: "CartAdditional",
+  components: { CartButtonCounter },
   computed: {
-    ...mapState("Cart", ["misc"]),
+    ...mapGetters("cart", {
+      additional: "getAdditional",
+    }),
   },
   methods: {
-    ...mapMutations("Cart", {
-      handelMiscCounterUpdate: UPDATE_CART_MISC_COUNTER,
+    ...mapActions("cart", {
+      increment: "incrementAdditional",
+      decrement: "decrementAdditional",
+      changeCount: "changeCountAdditional",
     }),
-    onCounterButtonClick(delta, index) {
-      this.handelMiscCounterUpdate({ miscIndex: index, delta });
-    },
   },
 };
 </script>

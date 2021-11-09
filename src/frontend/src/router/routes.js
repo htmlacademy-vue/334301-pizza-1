@@ -1,64 +1,62 @@
-import { isLoggedIn, authRequired } from "@/middlewares";
-
-import Index from "@/views/Index.vue";
-import Login from "@/views/Login.vue";
-import Cart from "@/views/Cart.vue";
-import Orders from "@/views/Orders.vue";
-import Profile from "@/views/Profile.vue";
+import Cart from "../views/Cart";
+import Login from "../views/Login";
+import Orders from "../views/Orders";
+import Profile from "../views/Profile";
+import IndexHome from "../views/Index";
+import LoginModal from "../views/LoginModal";
+import { LayoutName } from "../common/const/common";
+import { AppRoute, RouteName } from "../common/const/route";
+import { addresses, auth, isLogged, user } from "../middlewares";
 
 export default [
   {
-    path: "/",
-    name: "Index",
-    component: Index,
-    meta: {
-      layout: "AppLayoutDefault",
-    },
+    path: AppRoute.MAIN,
+    name: RouteName.HOME,
+    component: IndexHome,
     children: [
       {
-        path: "/login",
-        name: "Login",
-        component: Login,
+        path: AppRoute.LOGIN_INDEX,
+        name: RouteName.LOGIN_INDEX,
+        component: LoginModal,
         meta: {
-          layout: "AppLayoutDefault",
-          middlewares: [isLoggedIn],
+          middlewares: [isLogged],
         },
       },
     ],
   },
   {
-    path: "/cart",
-    name: "Cart",
+    path: AppRoute.CART,
+    name: RouteName.CART,
     component: Cart,
     meta: {
-      layout: "AppLayoutDefault",
+      middlewares: [user, addresses],
     },
   },
   {
-    path: "/orders",
-    name: "Orders",
-    component: Orders,
-    meta: {
-      layout: "AppLayoutInner",
-      middlewares: [authRequired],
-    },
-  },
-  {
-    path: "/profile",
-    name: "Profile",
-    component: Profile,
-    meta: {
-      layout: "AppLayoutInner",
-      middlewares: [authRequired],
-    },
-  },
-  {
-    path: "/sign-in",
-    name: "SignIn",
+    path: AppRoute.LOGIN,
+    name: RouteName.LOGIN,
     component: Login,
     meta: {
-      layout: "AppLayoutEmpty",
-      middlewares: [isLoggedIn],
+      layout: LayoutName.LOGIN,
+      middlewares: [isLogged],
+    },
+  },
+  {
+    path: AppRoute.PROFILE,
+    name: RouteName.PROFILE,
+    component: Profile,
+    meta: {
+      layout: LayoutName.SIDE_BAR,
+      middlewares: [auth, addresses],
+    },
+  },
+  {
+    path: AppRoute.ORDERS,
+    name: RouteName.ORDERS,
+    component: Orders,
+    meta: {
+      layout: LayoutName.SIDE_BAR,
+      middlewares: [auth],
     },
   },
 ];

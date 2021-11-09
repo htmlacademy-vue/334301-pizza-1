@@ -1,35 +1,48 @@
-version: '3'
+version: "3"
 
 services:
   db:
     image: postgres
+    restart: always
     environment:
-      POSTGRES_HOST_AUTH_METHOD: 'trust'
+#      POSTGRES_HOST_AUTH_METHOD: 'trust'
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: psql
       POSTGRES_DB: pizza
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
     ports:
-      - 5432:5432
+      - "5432:5432"
 
   backend:
-    build: src/backend
-    command: npm start
+    user: node
+    build:
+      context: src/backend
+      network: host
+    image: htmlacademy/vue-frontend
+    working_dir: /backend
     volumes:
       - ./src/backend:/backend
-      - /backend/node_modules
+#      - /backend/node_modules
     depends_on:
       - db
     ports:
-      - 3000:3000
+      - "3000:3000"
+    command: npm run start
 
   frontend:
-    build: src/frontend
-    command: npm run serve
+    user: node
+    build:
+      context: src/frontend
+      network: host
+    image: htmlacademy/vue-frontend
+    working_dir: /frontend
     environment:
       PORT: '8080'
       HOST: '0.0.0.0'
     ports:
-      - '8080:8080'
+      - "8080:8080"
     volumes:
       - ./src/frontend:/frontend
-      - /frontend/node_modules
+#      - /frontend/node_modules
+    command: npm run serve

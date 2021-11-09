@@ -1,149 +1,67 @@
 <template>
-  <div class="sheet">
-    <h2 class="title title--small sheet__title">Выберите·ингридиенты</h2>
+  <div class="content__ingredients">
+    <div class="sheet">
+      <h2 class="title title--small sheet__title">Выберите ингредиенты</h2>
 
-    <div class="sheet__content ingredients">
-      <div class="ingredients__sauce">
-        <p>Основной соус:</p>
+      <div class="sheet__content ingredients">
+        <slot />
 
-        <RadioButton
-          v-for="(sauce, sauceIndex) in preparedSauces"
-          :key="`sauce-${sauceIndex}`"
-          class="radio ingredients__input"
-          name="sauce"
-          :value="sauce.value"
-          :checked="sauce.value === currentIngredients.sauce.value"
-          :spanText="sauce.name"
-          @radioClick="onRadioButtonClick"
-        />
-      </div>
+        <div class="ingredients__filling">
+          <p>Начинка:</p>
 
-      <div class="ingredients__filling">
-        <p>Начинка:</p>
-
-        <ul class="ingredients__list">
-          <li
-            class="ingredients__item"
-            v-for="(
-              ingredient, ingredientIndex
-            ) in currentIngredients.subIngredients"
-            :key="`ingredient-${ingredientIndex}`"
-          >
-            <span
-              :class="ingredientFillingClass(ingredient.image)"
-              :draggable="ingredient.value < 3"
-              @dragstart="onDragStart(ingredientIndex)"
+          <ul class="ingredients__list">
+            <li
+              v-for="ingredient in ingredients"
+              :key="ingredient.id"
+              class="ingredients__item"
             >
-              {{ ingredient.name }}
-            </span>
+              <AppDrag
+                :transfer-data="ingredient"
+                :draggable="isDraggable(ingredient)"
+              >
+                <span :class="['filling', ingredient.class]">
+                  {{ ingredient.name }}
+                </span>
+              </AppDrag>
 
-            <div class="counter counter--orange ingredients__counter">
-              <button
-                type="button"
-                class="counter__button counter__button--minus"
-                :class="{ 'counter__button--disabled': ingredient.value <= 0 }"
-                @click="onCounterButtonClick(-1, ingredientIndex)"
-                :disabled="ingredient.value <= 0"
-              >
-                <span class="visually-hidden">Меньше</span>
-              </button>
-              <input
-                type="text"
-                name="counter"
-                class="counter__input"
-                :value="ingredient.value"
+              <ItemCounter
+                :item-id="ingredient.id"
+                :count="ingredient.count"
+                @setCount="setCount"
               />
-              <button
-                type="button"
-                class="counter__button counter__button--plus"
-                :class="{ 'counter__button--disabled': ingredient.value >= 3 }"
-                @click="onCounterButtonClick(1, ingredientIndex)"
-                :disabled="ingredient.value >= 3"
-              >
-                <span class="visually-hidden">Больше</span>
-              </button>
-            </div>
-          </li>
-        </ul>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex";
-import {
-  UPDATE_PIZZA_SAUSE,
-  UPDATE_PIZZA_SUBINGRIDIENT,
-} from "@/store/mutation-types.js";
-
-import pizza from "@/static/pizza.json";
-
-import RadioButton from "@/components/RadioButton.vue";
+import ItemCounter from "../../../common/components/AppItemCounter";
+import AppDrag from "../../../common/components/AppDrag";
+import { INGREDIENT_MAX_COUNT } from "../../../common/const/common";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   name: "BuilderIngredientsSelector",
-  components: {
-    RadioButton,
-  },
-  props: {
-    currentIngredients: {
-      type: Object,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      pizza,
-    };
-  },
+  components: { ItemCounter, AppDrag },
   computed: {
-    ...mapState("Builder", ["pizzaSchema"]),
-    preparedSauces() {
-      return this.pizzaSchema.sauces.map((sauce) => {
-        const value = sauce.id;
-
-        return {
-          ...sauce,
-          value,
-        };
-      });
-    },
+    ...mapGetters("builder", {
+      ingredients: "ingredients",
+      pizza: "pizza",
+    }),
   },
   methods: {
-    ...mapMutations("Builder", {
-      handelSauceUpdate: UPDATE_PIZZA_SAUSE,
-      handelSubIngridentUpdate: UPDATE_PIZZA_SUBINGRIDIENT,
+    ...mapActions("builder", {
+      setIngredient: "setIngredient",
     }),
-    onRadioButtonClick(radioValue) {
-      const sauseName = this.currentIngredients.sauce.name;
-      this.handelSauceUpdate({ key: sauseName, value: radioValue });
+    setCount(ingredientId, count) {
+      this.setIngredient({ ingredientId, count });
     },
-    onCounterButtonClick(delta, ingridientIndex) {
-      this.handelSubIngridentUpdate({ ingridientIndex, delta });
-    },
-    onDragStart(ingridientIndex) {
-      this.$emit("ingrideintDragged", ingridientIndex);
-    },
-    ingredientFillingClass(ingredientImage) {
-      const modificator = ingredientImage
-        .split("/")
-        .find((item) => item.endsWith(".svg") === true)
-        .slice(0, -4);
-
-      return `filling filling--${modificator}`;
+    isDraggable(ingredient) {
+      return ingredient.count < INGREDIENT_MAX_COUNT;
     },
   },
 };
 </script>
-
-<style lang="scss" scoped>
-@import "~@/assets/scss/mixins/mixins";
-
-@import "~@/assets/scss/layout/sheet";
-
-@import "~@/assets/scss/blocks/counter";
-@import "~@/assets/scss/blocks/filling";
-@import "~@/assets/scss/blocks/ingredients";
-@import "~@/assets/scss/blocks/title";
-</style>

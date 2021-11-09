@@ -1,0 +1,15 @@
+@mixin logo($image) {
+  display: inline-block;
+
+  width: 32px;
+  height: 32px;
+  margin-right: 8px;
+
+  content: "";
+  vertical-align: middle;
+
+  @if ($image) {
+    background: url($image) no-repeat center;
+    background-size: auto 50%;
+  }
+}

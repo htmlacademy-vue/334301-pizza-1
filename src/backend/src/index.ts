@@ -1,5 +1,5 @@
 import {ApplicationConfig, Application} from './application';
-import factory from './factory/index';
+// import factory from './factory/index';
 
 export * from './application';
 
@@ -7,7 +7,7 @@ export async function main(options: ApplicationConfig = {}) {
   const app = new Application(options);
   await app.boot();
   await app.migrateSchema();
-  await factory(app);
+  // await factory(app);
   await app.start();
 
   const url = app.restServer.url;

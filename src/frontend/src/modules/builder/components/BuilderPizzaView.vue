@@ -1,111 +1,97 @@
 <template>
-  <div>
-    <label class="input">
-      <span class="visually-hidden">Название пиццы</span>
-      <input
-        type="text"
-        name="pizza_name"
-        placeholder="Введите название пиццы"
-        :value="currentPizza.title.value"
-        @input="onTextInputChange"
-      />
-    </label>
+  <div class="content__pizza">
+    <slot name="pizzaName" />
 
-    <div
-      class="content__constructor"
-      @drop="onDrop"
-      @dragover.prevent
-      @dragenter.prevent
-    >
-      <div class="pizza" :class="foundationModificator">
+    <div class="content__constructor">
+      <AppDrop
+        class="pizza"
+        :class="pizzaFoundationClass"
+        @drop="addIngredient"
+      >
         <div class="pizza__wrapper">
-          <BuilderIngredient
-            v-for="(ingredient, ingredientIndex) in this.currentPizza
-              .ingredients.subIngredients"
-            :key="`pizza-filling-${ingredientIndex}`"
-            :class="pizzaFillingClass(ingredient.image, ingredient.value)"
-            :value="ingredient.value"
-          />
+          <transition-group name="ingredients">
+            <div
+              v-for="ingredient in pizza.ingredients"
+              class="pizza__filling"
+              :key="ingredient.id"
+              :class="getFillingClass(ingredient)"
+            />
+          </transition-group>
         </div>
-      </div>
+      </AppDrop>
     </div>
+
+    <slot name="pizzaPrice" />
   </div>
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex";
-import { UPDATE_PIZZA } from "@/store/mutation-types.js";
-import BuilderIngredient from "@/modules/builder/components/BuilderIngredient.vue";
+import AppDrop from "../../../common/components/AppDrop";
+import { mapGetters, mapActions } from "vuex";
+
+const CLASS_FOUNDATION_PREFIX = "pizza--foundation";
+const PIZZA_FILLING_SECOND = "pizza__filling--second";
+const PIZZA_FILLING_THIRD = "pizza__filling--third";
 
 export default {
   name: "BuilderPizzaView",
-  components: {
-    BuilderIngredient,
-  },
-  props: {
-    currentPizza: {
-      type: Object,
-      required: true,
+  components: { AppDrop },
+  methods: {
+    ...mapActions("builder", {
+      setIngredient: "setIngredient",
+    }),
+    addIngredient(ingredient) {
+      const ingredientId = ingredient.id;
+      const count = ingredient.count + 1;
+      this.setIngredient({ ingredientId, count });
+    },
+
+    getFillingClass(ingredient) {
+      const className = `pizza__${ingredient.class}`;
+
+      switch (ingredient.count) {
+        case 1:
+          return className;
+        case 2:
+          return `${className} ${PIZZA_FILLING_SECOND}`;
+        case 3:
+          return `${className} ${PIZZA_FILLING_THIRD}`;
+      }
     },
   },
   computed: {
-    ...mapState("Builder", ["pizzaSchema"]),
-    foundationModificator() {
-      const doughName = this.pizzaSchema.dough.find(
-        (item) => item.id === this.currentPizza.dough.value
-      );
-      const sauceName = this.pizzaSchema.sauces.find(
-        (item) => item.id === this.currentPizza.ingredients.sauce.value
-      );
-      const doughModificator = doughName === "Тонкое" ? "small" : "big";
-      const sauceModificator = sauceName === "Томатный" ? "tomato" : "creamy";
-
-      return `pizza--foundation--${doughModificator}-${sauceModificator}`;
-    },
-  },
-  methods: {
-    ...mapMutations("Builder", {
-      handelPizzaUpdate: UPDATE_PIZZA,
+    ...mapGetters("builder", {
+      pizza: "pizza",
     }),
-    onTextInputChange(evt) {
-      this.handelPizzaUpdate({
-        key: this.currentPizza.title.name,
-        value: evt.target.value,
-      });
-    },
-    onDrop() {
-      this.$emit("ingridientDropped");
-    },
-    pizzaFillingClass(ingredientImage, ingridientValue) {
-      const firstModificator = ingredientImage
-        .split("/")
-        .find((item) => item.endsWith(".svg") === true)
-        .slice(0, -4);
+    pizzaFoundationClass: function () {
+      const {
+        dough: { name: doughName },
+        sauce: { name: sauceName },
+      } = this.pizza;
 
-      let secondModificator = "";
-      switch (ingridientValue) {
-        case 2:
-          secondModificator = " pizza__filling--second";
-          break;
-        case 3:
-          secondModificator = " pizza__filling--third";
-          break;
-        default:
-          secondModificator = "";
-          break;
-      }
+      const size = doughName === "Толстое" ? "big" : "small";
+      const sauce = sauceName === "Томатный" ? "tomato" : "creamy";
 
-      return `pizza__filling pizza__filling--${firstModificator}${secondModificator}`;
+      return `${CLASS_FOUNDATION_PREFIX}--${size}-${sauce}`;
     },
   },
 };
 </script>
 
 <style lang="scss" scoped>
-@import "~@/assets/scss/mixins/mixins";
+.ingredients-enter-active {
+  animation: bounce-in 0.5s;
+}
 
-@import "~@/assets/scss/layout/content";
-
-@import "~@/assets/scss/blocks/input";
-@import "~@/assets/scss/blocks/pizza";
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
 </style>

@@ -1,18 +1,7 @@
 <template>
-  <div>
-    <AppLayoutHeader v-slot:header />
-
+  <div class="full-height">
+    <AppNotifications />
+    <AppHeader />
     <slot />
   </div>
 </template>
-
-<script>
-import AppLayoutHeader from "@/layouts/AppLayoutHeader";
-
-export default {
-  name: "AppLayoutDefault",
-  components: {
-    AppLayoutHeader,
-  },
-};
-</script>

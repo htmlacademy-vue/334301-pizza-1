@@ -1,69 +1,44 @@
 <template>
-  <div class="sheet">
-    <h2 class="title title--small sheet__title">Выберите размер</h2>
+  <div class="content__diameter">
+    <div class="sheet">
+      <h2 class="title title--small sheet__title">Выберите размер</h2>
 
-    <div class="sheet__content diameter">
-      <RadioButton
-        v-for="(size, sizeIndex) in preparedSizes"
-        :key="`size-${sizeIndex}`"
-        :class="`diameter__input diameter__input--${size.value}`"
-        name="diameter"
-        :value="size.value"
-        :checked="size.value === currentSize.value"
-        :spanText="size.name"
-        @radioClick="onRadioButtonClick(size.value)"
-      />
+      <div class="sheet__content diameter">
+        <label v-for="size in sizes" :key="size.id" :class="size.class">
+          <RadioButton
+            name="diameter"
+            class="visually-hidden"
+            :value="size.name"
+            :checked="size.id === pizza.size.id"
+            @handleChoice="setSize"
+          />
+          <span>{{ size.name }}</span>
+        </label>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex";
-
-import { UPDATE_PIZZA } from "@/store/mutation-types.js";
-
-import RadioButton from "@/components/RadioButton.vue";
+import RadioButton from "../../../common/components/AppRadioButton";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   name: "BuilderSizeSelector",
-  components: {
-    RadioButton,
-  },
-  props: {
-    currentSize: {
-      type: Object,
-      required: true,
-    },
-  },
+  components: { RadioButton },
   computed: {
-    ...mapState("Builder", ["pizzaSchema"]),
-    preparedSizes() {
-      return this.pizzaSchema.sizes.map((size) => {
-        let value = size.id;
-
-        return {
-          ...size,
-          value,
-        };
-      });
-    },
+    ...mapGetters("builder", {
+      sizes: "sizes",
+      pizza: "pizza",
+    }),
   },
   methods: {
-    ...mapMutations("Builder", {
-      handelPizzaUpdate: UPDATE_PIZZA,
+    ...mapActions("builder", {
+      setPizzaSize: "setSize",
     }),
-    onRadioButtonClick(radioValue) {
-      this.handelPizzaUpdate({ key: this.currentSize.name, value: radioValue });
+    setSize(sizeName) {
+      this.setPizzaSize(sizeName);
     },
   },
 };
 </script>
-
-<style lang="scss" scoped>
-@import "~@/assets/scss/mixins/mixins";
-
-@import "~@/assets/scss/layout/sheet";
-
-@import "~@/assets/scss/blocks/title";
-@import "~@/assets/scss/blocks/diameter";
-</style>

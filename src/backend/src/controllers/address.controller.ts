@@ -81,8 +81,7 @@ export class AddressController {
     },
   })
   async find(): Promise<Address[]> {
-    const addresses = await this.addressRepository.find();
-    return addresses.filter(address => !!address.userId);
+    return this.addressRepository.find();
   }
 
   @oas.visibility(OperationVisibility.UNDOCUMENTED)

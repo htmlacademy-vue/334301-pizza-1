@@ -1,93 +1,52 @@
 <template>
   <main class="content">
     <form action="#" method="post">
-      <div class="content__wrapper" v-if="currentPizza !== null">
+      <div class="content__wrapper">
         <h1 class="title title--big">Конструктор пиццы</h1>
 
-        <div class="content__dough">
-          <BuilderDoughSelector :currentDough="currentPizza.dough" />
-        </div>
+        <BuilderDoughSelector />
 
-        <div class="content__diameter">
-          <BuilderSizeSelector :currentSize="currentPizza.size" />
-        </div>
+        <BuilderSizeSelector />
 
-        <div class="content__ingredients">
-          <BuilderIngredientsSelector
-            :currentIngredients="currentPizza.ingredients"
-            @ingrideintDragged="onIngridientDrag"
-          />
-        </div>
+        <BuilderIngredientsSelector>
+          <BuilderSauceSelector />
+        </BuilderIngredientsSelector>
 
-        <div class="content__pizza">
-          <BuilderPizzaView
-            :currentPizza="currentPizza"
-            @ingridientDropped="onIngridientDrop"
-          />
+        <BuilderPizzaView>
+          <template #pizzaName>
+            <BuilderPizzaName />
+          </template>
 
-          <BuilderPriceCounter />
-        </div>
+          <template #pizzaPrice>
+            <BuilderPriceCounter />
+          </template>
+        </BuilderPizzaView>
       </div>
     </form>
-
-    <transition
-      name="view"
-      appear
-      enter-active-class="animate__animated animate__fadeIn"
-      leave-active-class="animate__animated animate__fadeOut"
-    >
+    <transition appear name="modal">
       <router-view />
     </transition>
   </main>
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex";
-
-import BuilderDoughSelector from "@/modules/builder/components/BuilderDoughSelector.vue";
-import BuilderIngredientsSelector from "@/modules/builder/components/BuilderIngredientsSelector.vue";
-import BuilderPizzaView from "@/modules/builder/components/BuilderPizzaView.vue";
-import BuilderPriceCounter from "@/modules/builder/components/BuilderPriceCounter.vue";
-import BuilderSizeSelector from "@/modules/builder/components/BuilderSizeSelector.vue";
-
-import { UPDATE_PIZZA_SUBINGRIDIENT } from "@/store/mutation-types.js";
+import BuilderDoughSelector from "../modules/builder/components/BuilderDoughSelector";
+import BuilderSizeSelector from "../modules/builder/components/BuilderSizeSelector";
+import BuilderIngredientsSelector from "../modules/builder/components/BuilderIngredientsSelector";
+import BuilderPizzaView from "../modules/builder/components/BuilderPizzaView";
+import BuilderPriceCounter from "../modules/builder/components/BuilderPriceCounter";
+import BuilderSauceSelector from "../modules/builder/components/BuilderSauceSelector";
+import BuilderPizzaName from "../modules/builder/components/BuilderPizzaName";
 
 export default {
-  name: "Index",
   components: {
     BuilderDoughSelector,
+    BuilderSizeSelector,
     BuilderIngredientsSelector,
+    BuilderSauceSelector,
     BuilderPizzaView,
     BuilderPriceCounter,
-    BuilderSizeSelector,
-  },
-  data() {
-    return {
-      draggedIngridientIndex: -1,
-    };
-  },
-  computed: {
-    ...mapState("Builder", ["currentPizza"]),
-  },
-  methods: {
-    ...mapMutations("Builder", {
-      handelSubIngridentUpdate: UPDATE_PIZZA_SUBINGRIDIENT,
-    }),
-    onIngridientDrag(ingridientIndex) {
-      this.draggedIngridientIndex = ingridientIndex;
-    },
-    onIngridientDrop() {
-      const ingridientIndex = this.draggedIngridientIndex;
-
-      this.handelSubIngridentUpdate({ ingridientIndex, delta: 1 });
-    },
+    BuilderPizzaName,
   },
 };
 </script>
-
-<style lang="scss" scoped>
-@import "~@/assets/scss/mixins/mixins";
-@import "~@/assets/scss/layout/content";
-
-@import "~@/assets/scss/blocks/title";
-</style>

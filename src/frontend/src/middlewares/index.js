@@ -1,5 +1,7 @@
-import isLoggedIn from "@/middlewares/isLoggedIn";
-import authRequired from "@/middlewares/authRequired";
-import middlewarePipeline from "@/middlewares/middlewarePipeline";
+import auth from "./auth";
+import middlewarePipeline from "./middlewarePipeline";
+import addresses from "./addresses";
+import user from "./user";
+import isLogged from "./isLogged";
 
-export { isLoggedIn, authRequired, middlewarePipeline };
+export { auth, addresses, middlewarePipeline, user, isLogged };

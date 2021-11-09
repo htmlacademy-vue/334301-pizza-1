@@ -1,10 +1,11 @@
 export default {
-  MISC: "misc",
-  SAUCES: "sauces",
-  SIZES: "sizes",
+  AUTH: "auth",
+  USERS: "users",
+  ADDRESSES: "addresses",
   DOUGH: "dough",
   INGREDIENTS: "ingredients",
-  AUTH: "auth",
-  ADDRESS: "address",
+  MISC: "misc",
   ORDERS: "orders",
+  SAUCES: "sauces",
+  SIZES: "sizes",
 };

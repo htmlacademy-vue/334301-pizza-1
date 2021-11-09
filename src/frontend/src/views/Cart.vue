@@ -1,40 +1,49 @@
 <template>
-  <form action="test.html" method="post" class="layout-form">
+  <form action="#" method="post" class="layout-form">
     <main class="content cart">
       <div class="container">
         <div class="cart__title">
           <h1 class="title title--big">Корзина</h1>
         </div>
 
-        <CartSheet />
+        <div v-if="!items.length" class="sheet cart__empty">
+          <p>В корзине нет ни одного товара</p>
+        </div>
 
-        <CartAdditional />
+        <template v-else>
+          <ul class="cart-list sheet">
+            <CartItem
+              v-for="product in items"
+              :key="product.id"
+              :product="product"
+            />
+          </ul>
 
-        <CartForm />
+          <CartAdditional />
+
+          <CartOrder />
+        </template>
       </div>
     </main>
 
-    <CartFooter />
-
-    <CartPopup />
+    <template v-if="items.length">
+      <CartFooter />
+    </template>
   </form>
 </template>
-
 <script>
-import CartSheet from "@/modules/cart/components/CartSheet.vue";
-import CartAdditional from "@/modules/cart/components/CartAdditional.vue";
-import CartForm from "@/modules/cart/components/CartForm.vue";
-import CartFooter from "@/modules/cart/components/CartFooter.vue";
-import CartPopup from "@/modules/cart/components/CartPopup.vue";
+import { mapGetters } from "vuex";
+import CartItem from "../modules/cart/components/CartItem";
+import CartAdditional from "../modules/cart/components/CartAdditional";
+import CartOrder from "../modules/cart/components/CartOrder";
+import CartFooter from "../modules/cart/components/CartFooter";
 
 export default {
-  name: "Cart",
-  components: {
-    CartSheet,
-    CartAdditional,
-    CartForm,
-    CartFooter,
-    CartPopup,
+  components: { CartItem, CartOrder, CartAdditional, CartFooter },
+  computed: {
+    ...mapGetters("cart", {
+      items: "getItems",
+    }),
   },
 };
 </script>
